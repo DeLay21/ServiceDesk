@@ -114,6 +114,29 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+            const SizedBox(height: 25),
+
+            const Align(
+              alignment: Alignment.center,
+              child: Text(
+                'ou faça login com',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromRGBO(138, 155, 181, 1),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Icon(Icons.email),
+                Icon(Icons.facebook),
+                Icon(Icons.fingerprint),
+              ],
+            ),
           ],
         ),
       ),
