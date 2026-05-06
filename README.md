@@ -29,7 +29,7 @@ Emily Oliveira - Login, Design da tela e apoio as funcionalidades principais.
 
 Isaac Kerllon - Login, 
 
-Luiz Gustavo - Modulo de Agendamento, 
+Luiz Gustavo - Modulo de Agendamento: Cadastrar, Alterar e excluir tarefas 
 
 Tiago Azevedo Configurações,
 
