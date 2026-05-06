@@ -19,15 +19,15 @@ exemplos, orientações sobre desenvolvimento móvel e uma referência completa 
 
 ## Telas/Funcionalidades 
 
-- **Arthur Enrik** - Modulo de Agendamento  
+- **Arthur Enrik** - Modulo de Agendamento *(Criar o sistema de datas da Home Page)*
 
-- **Emily Oliveira** - Login *(Design da tela e apoio as funcionalidades principais)*
+- **Emily Oliveira** - Login *(Cadastro e Recuperação de senha)*
 
-- **Isaac Kerllon** - Login
+- **Isaac Kerllon** - Login *(Cadastro e Login)*
 
 - **Luiz Gustavo** - Modulo de Agendamento *(Modulo de Agendamento: Cadastrar, Alterar e excluir tarefas)*
 
 - **Tiago Azevedo** - Configurações *(Gerenciamento dos dados pessoais, gerenciar senha, politica de privacidade)*
 
-- **Yuri Raymond** - Home
+- **Yuri Raymond** - Home e Modulo de Agendamento *(Criar um filtro de Serviços e CRUDs do Modulo de Agendamento)*
 
