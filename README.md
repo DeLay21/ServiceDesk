@@ -23,7 +23,7 @@ samples, guidance on mobile development, and a full API reference.
 
 Telas/Funcionalidades 
 
-Arthur Enrik - Modulo de Agendamento,  
+Arthur Enrik - Modulo de Agendamento  
 
 Emily Oliveira - Login, Design da tela e apoio as funcionalidades principais.
 
