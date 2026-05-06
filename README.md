@@ -1,6 +1,8 @@
-# servicedesk
+# ServiceDesk
 
-A new Flutter project.
+organizador de serviços. Auxiliando os profissionais a organizarem
+atendimentos e serviços prestados sendo um aplicativo para registro e
+acompanhamento de atendimentos.
 
 ## Getting Started
 
@@ -15,3 +17,20 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+
+	
+
+Telas/Funcionalidades 
+
+Arthur Enrik - Modulo de Agendamento,  
+
+Emily Oliveira - Login, Design da tela e apoio as funcionalidades principais.
+
+Isaac Kerllon - Login, 
+
+Luiz Gustavo - Modulo de Agendamento, 
+
+Tiago Azevedo Configurações,
+
+Yuri Raymond Home, 
