@@ -23,11 +23,11 @@ exemplos, orientações sobre desenvolvimento móvel e uma referência completa 
 
 - **Emily Oliveira** - Login *(Cadastro e Recuperação de senha)*
 
-- **Isaac Kerllon** - Login *(Cadastro e Login)*
+- **Isaac Kerllon** - Home *(Estruturar a home)*
 
-- **Luiz Gustavo** - Modulo de Agendamento *(Modulo de Agendamento: Cadastrar, Alterar e excluir tarefas)*
+- **Luiz Gustavo** - Modulo de Agendamento *(Cadastrar, Alterar e excluir tarefas)*
 
 - **Tiago Azevedo** - Configurações *(Gerenciamento dos dados pessoais, gerenciar senha, politica de privacidade)*
 
-- **Yuri Raymond** - Home e Modulo de Agendamento *(Criar um filtro de Serviços e CRUDs do Modulo de Agendamento)*
+- **Yuri Raymond** - Home *(Criar um filtro de Serviços)*
 
