@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:servicedesk/config/gerenc_senha.dart';
 
 class ConfigPage extends StatefulWidget {
   const ConfigPage({super.key});
@@ -29,7 +30,7 @@ class _ConfigPageState extends State<ConfigPage> {
           preferredSize: const Size.fromHeight(1),
           child: Divider(
             height: 1,
-            thickness: 1, 
+            thickness: 1,
             color: Color.fromRGBO(197, 206, 220, 0.996),
           ),
         ),
@@ -115,7 +116,14 @@ class _ConfigPageState extends State<ConfigPage> {
                   color: Color.fromRGBO(14, 51, 107, 1),
                   size: 16,
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const GerencSenha(),
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(height: 10), //espaço
