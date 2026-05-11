@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:servicedesk/config/detalhes_perfil.dart';
 import 'package:servicedesk/config/gerenc_senha.dart';
 
 class ConfigPage extends StatefulWidget {
@@ -86,12 +87,24 @@ class _ConfigPageState extends State<ConfigPage> {
                       endIndent: 0,
                       color: Color.fromRGBO(197, 206, 220, 0.996),
                     ),
-                    const Text(
-                      'Complete seu Perfil',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(14, 51, 107, 1),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const DetalhesPerfil(),
+                          ),
+                        );
+                      },
+                      mouseCursor: SystemMouseCursors.click, 
+                      hoverColor: Colors.transparent, // pra tirar essas decorações
+                      child: const Text(
+                        'Complete seu perfil',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromRGBO(14, 51, 107, 1),
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ],
