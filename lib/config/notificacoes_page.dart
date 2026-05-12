@@ -16,6 +16,7 @@ class _NotificacoesState extends State<Notificacoes> {
     super.dispose();
   }
 
+  @override
   Widget build(BuildContext contex) {
     return Scaffold(
       appBar: AppBar(
