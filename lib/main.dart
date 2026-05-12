@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'login.dart';
+import 'package:servicedesk/login/login.dart';
 
 void main() {
   runApp(const ServiceDesk());
@@ -11,7 +11,9 @@ class ServiceDesk extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: Color.fromRGBO(27, 79, 138, 1)),
+      home: const LoginPage(),
     );
   }
 }
