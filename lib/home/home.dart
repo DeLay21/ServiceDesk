@@ -11,6 +11,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _indiceAtual = 2;
     Widget _CaixaDias(String dia, String semana, bool selecionado) {
         return Container(
             padding: EdgeInsets.symmetric(horizontal: 28, vertical: 18),
@@ -48,7 +49,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Padding(padding: EdgeInsets.all(20),
-        child: Column(
+        child: ListView(
             children: [
                 Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -232,7 +233,74 @@ class _HomePageState extends State<HomePage> {
                             )
                         ],
                     ),
-                )
+                ),
+                //Barra de navegação
+                Container(
+                    decoration: BoxDecoration(
+                        color: Color.fromRGBO(27, 79, 138, 1),
+                        borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: BottomNavigationBar(
+                        currentIndex: _indiceAtual,
+                    onTap: (indice) {
+                        setState(() {
+                            _indiceAtual = indice;
+                        });
+                    },
+                    selectedItemColor: Colors.white,
+                    unselectedItemColor: Colors.white60,
+                    showSelectedLabels: false,
+                    showUnselectedLabels: false,
+                    type: BottomNavigationBarType.fixed,
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    items: [
+                        BottomNavigationBarItem(
+                            icon: Icon(Icons.bookmark_border, size: 28),
+                            activeIcon: Icon(Icons.bookmark, size: 28),
+                            label: 'Favoritos',
+                        ),
+                        BottomNavigationBarItem(
+                            icon: Icon(Icons.download_outlined, size: 28),
+                            activeIcon: Icon(Icons.download, size: 28),
+                            label: 'Adicionar',
+                        ),
+                        BottomNavigationBarItem(
+                            icon: Container(
+                                alignment: Alignment.center,
+                                padding: EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                ),
+                                child: Icon(Icons.home,
+                                    color: Color.fromRGBO(27, 79, 138, 1), size: 36),
+                            ),
+                            activeIcon: Container(
+                                alignment: Alignment.topCenter,
+                                padding: EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                ),
+                                child: Icon(Icons.home,
+                                    color: Color.fromRGBO(27, 79, 138, 1), size: 36),
+                            ),
+                            label: 'Home',
+                        ),
+                        BottomNavigationBarItem(
+                            icon: Icon(Icons.list_alt_outlined, size: 28),
+                            activeIcon: Icon(Icons.list_alt, size: 28),
+                            label: 'Chamados',
+                        ),
+                        BottomNavigationBarItem(
+                            icon: Icon(Icons.person_outline, size: 28),
+                            activeIcon: Icon(Icons.person, size: 28),
+                            label: 'Perfil',
+                        ),
+                    ],
+                ),
+            ),  
             ],
         ),
         ),
