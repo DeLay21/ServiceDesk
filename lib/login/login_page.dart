@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:servicedesk/login/cadastro_page.dart';
 import 'package:servicedesk/login/esqueci_senha_page.dart';
+import 'package:servicedesk/home/home.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,7 +11,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   TextEditingController emailController = TextEditingController();
   TextEditingController senhaController = TextEditingController();
 
@@ -26,7 +26,6 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-
               const SizedBox(height: 100),
 
               const Text(
@@ -148,6 +147,11 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     print('Email: ${emailController.text}');
                     print('Senha: ${senhaController.text}');
+
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HomePage()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1B2D6B),
