@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:servicedesk/login/login_page.dart';
 import 'package:servicedesk/config/notificacoes_page.dart';
 import 'package:servicedesk/config/config_page.dart';
 
