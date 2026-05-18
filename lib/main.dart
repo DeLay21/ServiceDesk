@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:servicedesk/login/login_page.dart';
+import 'package:servicedesk/login/cadastro_page.dart';
+import 'package:servicedesk/login/esqueci_senha_page.dart';
+import 'package:servicedesk/login/redefinir_senha_page.dart';
 
 void main() {
   runApp(const ServiceDesk());
@@ -13,7 +16,13 @@ class ServiceDesk extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: Color.fromRGBO(27, 79, 138, 1)),
-      home: LoginPage(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => LoginPage(),
+        '/cadastro': (context) => CadastroPage(),
+        '/esqueci': (context) => EsqueciSenhaPage(),
+        '/redefinir': (context) => RedefinirSenhaPage(),
+      },
     );
   }
 }
