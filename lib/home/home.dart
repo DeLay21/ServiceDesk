@@ -11,6 +11,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool _hoverHome = false;
   int _indiceAtual = 2;
     Widget _CaixaDias(String dia, String semana, bool selecionado) {
         return Container(
@@ -234,73 +235,141 @@ class _HomePageState extends State<HomePage> {
                         ],
                     ),
                 ),
-                //Barra de navegação
-                Container(
-                    decoration: BoxDecoration(
+                Stack(
+                  alignment: Alignment.bottomCenter,
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: 14,
+                      ),
+                      decoration: BoxDecoration(
                         color: Color.fromRGBO(27, 79, 138, 1),
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(35),
+                      ),
+                      child: SizedBox(
+                        height: 67,
+                        child: BottomNavigationBar(
+                          currentIndex: _indiceAtual,
+                          onTap: (indice) {
+                            setState(() {
+                              _indiceAtual = indice;
+                            });
+                          },
+                          selectedItemColor: Colors.white,
+                          unselectedItemColor: Colors.white60,
+                          showSelectedLabels: false,
+                          showUnselectedLabels: false,
+                          type: BottomNavigationBarType.fixed,
+                          backgroundColor: Colors.transparent,
+                          elevation: 0,
+                          iconSize: 28,
+                          items: [
+                            BottomNavigationBarItem(
+                              icon: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Icon(Icons.bookmark_border),
+                              ),
+                              activeIcon: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Icon(Icons.bookmark),
+                              ),
+                              label: '',
+                            ),
+                            BottomNavigationBarItem(
+                              icon: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Icon(Icons.download_outlined),
+                              ),
+                              activeIcon: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Icon(Icons.download),
+                              ),
+                              label: '',
+                            ),
+                            BottomNavigationBarItem(
+                              icon: SizedBox(width: 40),
+                              label: '',
+                            ),
+                            BottomNavigationBarItem(
+                              icon: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Icon(Icons.list_alt_outlined),
+                              ),
+                              activeIcon: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Icon(Icons.list_alt),
+                              ),
+                              label: '',
+                            ),
+                            BottomNavigationBarItem(
+                              icon: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Icon(Icons.person_outline),
+                              ),
+                              activeIcon: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Icon(Icons.person),
+                              ),
+                              label: '',
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    child: BottomNavigationBar(
-                        currentIndex: _indiceAtual,
-                    onTap: (indice) {
-                        setState(() {
-                            _indiceAtual = indice;
-                        });
-                    },
-                    selectedItemColor: Colors.white,
-                    unselectedItemColor: Colors.white60,
-                    showSelectedLabels: false,
-                    showUnselectedLabels: false,
-                    type: BottomNavigationBarType.fixed,
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    items: [
-                        BottomNavigationBarItem(
-                            icon: Icon(Icons.bookmark_border, size: 28),
-                            activeIcon: Icon(Icons.bookmark, size: 28),
-                            label: 'Favoritos',
-                        ),
-                        BottomNavigationBarItem(
-                            icon: Icon(Icons.download_outlined, size: 28),
-                            activeIcon: Icon(Icons.download, size: 28),
-                            label: 'Adicionar',
-                        ),
-                        BottomNavigationBarItem(
-                            icon: Container(
-                                alignment: Alignment.center,
-                                padding: EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                ),
-                                child: Icon(Icons.home,
-                                    color: Color.fromRGBO(27, 79, 138, 1), size: 36),
+                    Positioned(
+                      bottom: 16.5,
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        onEnter: (_) {
+                          if (_indiceAtual != 2) {
+                            setState(() {
+                              _hoverHome = true;
+                            });
+                          }
+                        },
+                        onExit: (_) {
+                          setState(() {
+                            _hoverHome = false;
+                          });
+                        },
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _indiceAtual = 2;
+                            });
+                          },
+                          child: AnimatedScale(
+                            duration: Duration(milliseconds: 200),
+                            curve: Curves.easeInOut,
+                            scale: _indiceAtual == 2 || _hoverHome ? 1.15 : 1.0,
+                            child: Container(
+                              padding: EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.home,
+                                color: Color.fromRGBO(27, 79, 138, 1),
+                                size: 38,
+                              ),
                             ),
-                            activeIcon: Container(
-                                alignment: Alignment.topCenter,
-                                padding: EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                ),
-                                child: Icon(Icons.home,
-                                    color: Color.fromRGBO(27, 79, 138, 1), size: 36),
-                            ),
-                            label: 'Home',
+                          ),
                         ),
-                        BottomNavigationBarItem(
-                            icon: Icon(Icons.list_alt_outlined, size: 28),
-                            activeIcon: Icon(Icons.list_alt, size: 28),
-                            label: 'Chamados',
-                        ),
-                        BottomNavigationBarItem(
-                            icon: Icon(Icons.person_outline, size: 28),
-                            activeIcon: Icon(Icons.person, size: 28),
-                            label: 'Perfil',
-                        ),
-                    ],
-                ),
-            ),  
+                      ),
+                    ),
+                  ],
+                )
             ],
         ),
         ),
