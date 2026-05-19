@@ -11,6 +11,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool _hoverHome = false;
+  int _indiceAtual = 2;
     Widget _CaixaDias(String dia, String semana, bool selecionado) {
         return Container(
             padding: EdgeInsets.symmetric(horizontal: 28, vertical: 18),
@@ -48,7 +50,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Padding(padding: EdgeInsets.all(20),
-        child: Column(
+        child: ListView(
             children: [
                 Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -232,6 +234,141 @@ class _HomePageState extends State<HomePage> {
                             )
                         ],
                     ),
+                ),
+                Stack(
+                  alignment: Alignment.bottomCenter,
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: 14,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Color.fromRGBO(27, 79, 138, 1),
+                        borderRadius: BorderRadius.circular(35),
+                      ),
+                      child: SizedBox(
+                        height: 67,
+                        child: BottomNavigationBar(
+                          currentIndex: _indiceAtual,
+                          onTap: (indice) {
+                            setState(() {
+                              _indiceAtual = indice;
+                            });
+                          },
+                          selectedItemColor: Colors.white,
+                          unselectedItemColor: Colors.white60,
+                          showSelectedLabels: false,
+                          showUnselectedLabels: false,
+                          type: BottomNavigationBarType.fixed,
+                          backgroundColor: Colors.transparent,
+                          elevation: 0,
+                          iconSize: 28,
+                          items: [
+                            BottomNavigationBarItem(
+                              icon: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Icon(Icons.bookmark_border),
+                              ),
+                              activeIcon: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Icon(Icons.bookmark),
+                              ),
+                              label: '',
+                            ),
+                            BottomNavigationBarItem(
+                              icon: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Icon(Icons.download_outlined),
+                              ),
+                              activeIcon: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Icon(Icons.download),
+                              ),
+                              label: '',
+                            ),
+                            BottomNavigationBarItem(
+                              icon: SizedBox(width: 40),
+                              label: '',
+                            ),
+                            BottomNavigationBarItem(
+                              icon: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Icon(Icons.list_alt_outlined),
+                              ),
+                              activeIcon: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Icon(Icons.list_alt),
+                              ),
+                              label: '',
+                            ),
+                            BottomNavigationBarItem(
+                              icon: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Icon(Icons.person_outline),
+                              ),
+                              activeIcon: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Icon(Icons.person),
+                              ),
+                              label: '',
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 16.5,
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        onEnter: (_) {
+                          if (_indiceAtual != 2) {
+                            setState(() {
+                              _hoverHome = true;
+                            });
+                          }
+                        },
+                        onExit: (_) {
+                          setState(() {
+                            _hoverHome = false;
+                          });
+                        },
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _indiceAtual = 2;
+                            });
+                          },
+                          child: AnimatedScale(
+                            duration: Duration(milliseconds: 200),
+                            curve: Curves.easeInOut,
+                            scale: _indiceAtual == 2 || _hoverHome ? 1.15 : 1.0,
+                            child: Container(
+                              padding: EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.home,
+                                color: Color.fromRGBO(27, 79, 138, 1),
+                                size: 38,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 )
             ],
         ),
