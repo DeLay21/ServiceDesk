@@ -49,10 +49,14 @@ class AgendamentoPage extends StatefulWidget {
 class _AgendamentoPageState extends State<AgendamentoPage> {
   final TextEditingController _clienteController = TextEditingController();
   final TextEditingController _pedidoController = TextEditingController();
+  final TextEditingController _dataController = TextEditingController();
+  final TextEditingController _horarioController = TextEditingController();
 
   void _salvarEVoltar() {
     if (_clienteController.text.isNotEmpty &&
-        _pedidoController.text.isNotEmpty) {
+        _pedidoController.text.isNotEmpty &&
+        _dataController.text.isNotEmpty &&
+        _horarioController.text.isNotEmpty) {
       AgendamentoServiceDeskGlobal.add(
         Agendamento(
           cliente: _clienteController.text,
@@ -134,7 +138,7 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
               ),
             ),
             TextField(
-              controller: _clienteController,
+              controller: _dataController,
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Color.fromRGBO(232, 238, 247, 1),
@@ -153,7 +157,7 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
               ),
             ),
             TextField(
-              controller: _pedidoController,
+              controller: _horarioController,
               decoration: InputDecoration(
                 //labelText: 'Qual é seu nome?',
                 filled: true,
