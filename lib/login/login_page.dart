@@ -123,14 +123,13 @@ class _LoginPageState extends State<LoginPage> {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const EsqueciSenhaPage(),
-                      ),
-                    );
-                  },
+                 onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => EsqueciSenhaPage(),
+                    ),
+                  );
+                },
                   child: const Text(
                     'Esqueci a senha',
                     style: TextStyle(color: Color(0xFFAAAAAA), fontSize: 13),
@@ -180,10 +179,9 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
+                      Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => const CadastroPage(),
+                          builder: (context) => CadastroPage(),
                         ),
                       );
                     },
@@ -198,7 +196,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 32),
             ],
           ),
