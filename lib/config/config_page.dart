@@ -44,7 +44,7 @@ class _ConfigPageState extends State<ConfigPage> {
           //mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Card(
-              color: const Color.fromRGBO(230, 241, 251, 1),
+              color: const Color.fromRGBO(232, 238, 247, 1),
               elevation: 0,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -115,7 +115,7 @@ class _ConfigPageState extends State<ConfigPage> {
             ),
             const SizedBox(height: 25), //espaço
             Card(
-              color: const Color.fromRGBO(230, 241, 251, 1),
+              color: const Color.fromRGBO(232, 238, 247, 1),
               elevation: 0,
               //margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
               child: ListTile(
@@ -143,7 +143,7 @@ class _ConfigPageState extends State<ConfigPage> {
             ),
             const SizedBox(height: 10), //espaço
             Card(
-              color: const Color.fromRGBO(230, 241, 251, 1),
+              color: const Color.fromRGBO(232, 238, 247, 1),
               elevation: 0,
               //margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
               child: ListTile(
@@ -170,7 +170,7 @@ class _ConfigPageState extends State<ConfigPage> {
               ),
             ),
             Card(
-              color: const Color.fromRGBO(230, 241, 251, 1),
+              color: const Color.fromRGBO(232, 238, 247, 1),
               elevation: 0,
               //margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
               child: ListTile(
@@ -198,7 +198,7 @@ class _ConfigPageState extends State<ConfigPage> {
             ),
             const SizedBox(height: 10), // espaço
             Card(
-              color: const Color.fromRGBO(230, 241, 251, 1),
+              color: const Color.fromRGBO(232, 238, 247, 1),
               elevation: 0,
               //margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
               child: ListTile(
