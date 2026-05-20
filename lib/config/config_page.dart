@@ -3,6 +3,7 @@ import 'package:servicedesk/config/detalhes_perfil.dart';
 import 'package:servicedesk/config/gerenc_senha.dart';
 import 'package:servicedesk/config/notificacoes_page.dart';
 import 'package:servicedesk/config/politica_page.dart';
+import 'package:servicedesk/login/login_page.dart';
 
 class ConfigPage extends StatefulWidget {
   const ConfigPage({super.key});
@@ -214,7 +215,14 @@ class _ConfigPageState extends State<ConfigPage> {
                   color: Color.fromRGBO(14, 51, 107, 1),
                   size: 16,
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginPage(),
+                    ),
+                  );
+                },
               ),
             ),
           ],
