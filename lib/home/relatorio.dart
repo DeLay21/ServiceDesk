@@ -1,81 +1,73 @@
 import 'package:flutter/material.dart';
 
-class Agendamento {
+class Relatorio {
   String cliente;
-  String pedido;
-  DateTime? data;
-  TimeOfDay? horario;
-  bool concluida;
+  DateTime? inicio;
+  DateTime? fim;
+  String tipo;
 
-  Agendamento({
+  Relatorio({
     required this.cliente,
-    required this.pedido,
-    this.data,
-    this.horario,
-    this.concluida = false,
+    this.inicio,
+    this.fim,
+    required this.tipo,
   });
 
   Map<String, dynamic> toMap() => {
     'cliente': cliente,
-    'pedido': pedido,
-    'data': data?.toIso8601String(),
-    'horario': horario != null ? '${horario!.hour}:${horario!.minute}' : null,
-    'finalizada': concluida,
+    'inicio': inicio?.toIso8601String(),
+    'fim': fim?.toIso8601String(),
+    'tipo': tipo,
   };
 
-  factory Agendamento.fromMap(Map<String, dynamic> map) => Agendamento(
+  factory Relatorio.fromMap(Map<String, dynamic> map) => Relatorio(
     cliente: map['cliente'] as String,
-    pedido: map['pedido'] as String,
-    data: map['data'] != null ? DateTime.parse(map['Data'] as String) : null,
-    horario: map['horario'] != null
-        ? TimeOfDay(
-            hour: int.parse((map['horario'] as String).split(':')[0]),
-            minute: int.parse((map['horario'] as String).split(':')[1]),
-          )
+    inicio: map['inicio'] != null
+        ? DateTime.parse(map['inicio'] as String)
         : null,
-    concluida: map['concluida'] as bool,
+    fim: map['fim'] != null ? DateTime.parse(map['fim'] as String) : null,
+    tipo: map['tipo'] as String,
   );
 }
 
-List<Agendamento> AgendamentoServiceDeskGlobal = [];
+List<Relatorio> RelatorioServiceDeskGlobal = [];
 
-class AgendamentoModal extends StatefulWidget {
-  const AgendamentoModal({super.key});
+class RelatorioModal extends StatefulWidget {
+  const RelatorioModal({super.key});
 
   @override
-  State<AgendamentoModal> createState() => _AgendamentoModalState();
+  State<RelatorioModal> createState() => _RelatorioModalState();
 }
 
-class _AgendamentoModalState extends State<AgendamentoModal> {
+class _RelatorioModalState extends State<RelatorioModal> {
   final TextEditingController _clienteController = TextEditingController();
-  final TextEditingController _pedidoController = TextEditingController();
-  final TextEditingController _dataController = TextEditingController();
-  final TextEditingController _horarioController = TextEditingController();
+  final TextEditingController _inicioController = TextEditingController();
+  final TextEditingController _fimController = TextEditingController();
+  final TextEditingController _tipoController = TextEditingController();
 
   void _salvar() {
     if (_clienteController.text.isNotEmpty &&
-        _pedidoController.text.isNotEmpty &&
-        _dataController.text.isNotEmpty &&
-        _horarioController.text.isNotEmpty) {
-      AgendamentoServiceDeskGlobal.add(
-        Agendamento(
+        _inicioController.text.isNotEmpty &&
+        _fimController.text.isNotEmpty &&
+        _tipoController.text.isNotEmpty) {
+      RelatorioServiceDeskGlobal.add(
+        Relatorio(
           cliente: _clienteController.text,
-          pedido: _pedidoController.text,
-          data: DateTime.now(),
-          horario: TimeOfDay.now(),
-          concluida: false,
+          inicio: DateTime.now(),
+          fim: DateTime.now(),
+          tipo: _tipoController.text,
         ),
       );
-      Navigator.pop(context); // fecha o modal
+      Navigator.pop(context);
     }
   }
 
   @override
   void dispose() {
     _clienteController.dispose();
-    _pedidoController.dispose();
-    _dataController.dispose();
-    _horarioController.dispose();
+    _inicioController.dispose();
+    _fimController.dispose();
+    _tipoController.dispose();
     super.dispose();
   }
 
@@ -92,10 +84,9 @@ class _AgendamentoModalState extends State<AgendamentoModal> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ← título do modal
           const Center(
             child: Text(
-              'Novo Agendamento',
+              'Relatório',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -119,9 +110,10 @@ class _AgendamentoModalState extends State<AgendamentoModal> {
           ),
           const SizedBox(height: 15),
 
-          const Text('Pedido', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text('Início', style: TextStyle(fontWeight: FontWeight.bold)),
           TextField(
-            controller: _pedidoController,
+            controller: _inicioController,
+            keyboardType: TextInputType.datetime,
             decoration: InputDecoration(
               filled: true,
               fillColor: const Color.fromRGBO(232, 238, 247, 1),
@@ -133,9 +125,10 @@ class _AgendamentoModalState extends State<AgendamentoModal> {
           ),
           const SizedBox(height: 15),
 
-          const Text('Data', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text('Fim', style: TextStyle(fontWeight: FontWeight.bold)),
           TextField(
-            controller: _dataController,
+            controller: _fimController,
+            keyboardType: TextInputType.datetime,
             decoration: InputDecoration(
               filled: true,
               fillColor: const Color.fromRGBO(232, 238, 247, 1),
@@ -147,9 +140,9 @@ class _AgendamentoModalState extends State<AgendamentoModal> {
           ),
           const SizedBox(height: 15),
 
-          const Text('Horário', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text('Tipo', style: TextStyle(fontWeight: FontWeight.bold)),
           TextField(
-            controller: _horarioController,
+            controller: _tipoController,
             decoration: InputDecoration(
               filled: true,
               fillColor: const Color.fromRGBO(232, 238, 247, 1),
