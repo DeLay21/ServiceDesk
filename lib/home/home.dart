@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:servicedesk/config/detalhes_perfil.dart';
+import 'package:servicedesk/home/relatorio.dart';
 import 'package:servicedesk/login/login_page.dart';
 import 'package:servicedesk/config/notificacoes_page.dart';
 import 'package:servicedesk/config/config_page.dart';
@@ -13,7 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool _hoverHome = false;
+  //bool _hoverHome = false;
   int _indiceAtual = 2;
   Widget _CaixaDias(String dia, String semana, bool selecionado) {
     return Container(
@@ -48,158 +49,186 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Stack(
-          alignment: Alignment.bottomCenter,
-          clipBehavior: Clip.none,
-          children: [
-            Container(
-              margin: EdgeInsets.only(left: 16, right: 16, bottom: 14),
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(27, 79, 138, 1),
-                borderRadius: BorderRadius.circular(35),
-              ),
-              child: SizedBox(
-                height: 67,
-                child: BottomNavigationBar(
-                  currentIndex: _indiceAtual,
-                  onTap: (indice) {
-                    setState(() {
-                      _indiceAtual = indice;
-                    });
-                    if (indice == 0) {
-                      
-                    } else if (indice == 1) {
-                      
-                    } else if (indice == 3) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AgendamentoPage(),
-                        ),
-                      );
-                    } else if (indice == 4) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const DetalhesPerfil(),
-                        ),
-                      );
-                    }
-                  },
-                  selectedItemColor: Colors.white,
-                  unselectedItemColor: Colors.white60,
-                  showSelectedLabels: false,
-                  showUnselectedLabels: false,
-                  type: BottomNavigationBarType.fixed,
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  iconSize: 28,
-                  items: [
-                    BottomNavigationBarItem(
-                      icon: Padding(
-                        padding: EdgeInsets.only(top: 4),
-                        child: Icon(Icons.bookmark_border),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            child: Center(
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromRGBO(27, 79, 138, 1),
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(200, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(20),
                       ),
-                      activeIcon: Padding(
-                        padding: EdgeInsets.only(top: 4),
-                        child: Icon(Icons.bookmark),
-                      ),
-                      label: '',
                     ),
-                    BottomNavigationBarItem(
-                      icon: Padding(
-                        padding: EdgeInsets.only(top: 4),
-                        child: Icon(Icons.download_outlined),
-                      ),
-                      activeIcon: Padding(
-                        padding: EdgeInsets.only(top: 4),
-                        child: Icon(Icons.download),
-                      ),
-                      label: '',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: SizedBox(width: 40),
-                      label: '',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Padding(
-                        padding: EdgeInsets.only(top: 4),
-                        child: Icon(Icons.list_alt_outlined),
-                      ),
-                      activeIcon: Padding(
-                        padding: EdgeInsets.only(top: 4),
-                        child: Icon(Icons.list_alt),
-                      ),
-                      label: '',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Padding(
-                        padding: EdgeInsets.only(top: 4),
-                        child: Icon(Icons.person_outline),
-                      ),
-                      activeIcon: Padding(
-                        padding: EdgeInsets.only(top: 4),
-                        child: Icon(Icons.person),
-                      ),
-                      label: '',
-                    ),
-                  ],
+                    builder: (context) => const AgendamentoModal(),
+                  );
+                },
+                icon: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.add,
+                    color: Color.fromRGBO(27, 79, 138, 1),
+                    size: 18,
+                  ),
+                ),
+                label: const Text(
+                  'Agendar',
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ),
-            Positioned(
-              bottom: 16.5,
-              child: MouseRegion(
-                cursor: SystemMouseCursors.click,
-                onEnter: (_) {
-                  if (_indiceAtual != 2) {
-                    setState(() {
-                      _hoverHome = true;
-                    });
-                  }
-                },
-                onExit: (_) {
-                  setState(() {
-                    _hoverHome = false;
-                  });
-                },
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _indiceAtual = 2;
-                    });
-                  },
-                  child: AnimatedScale(
-                    duration: Duration(milliseconds: 200),
-                    curve: Curves.easeInOut,
-                    scale: _indiceAtual == 2 || _hoverHome ? 1.15 : 1.0,
-                    child: Container(
-                      padding: EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 8,
-                            offset: Offset(0, 4),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    bottom: 14,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color.fromRGBO(27, 79, 138, 1),
+                    borderRadius: BorderRadius.circular(35),
+                  ),
+                  child: SizedBox(
+                    height: 67,
+                    child: BottomNavigationBar(
+                      currentIndex: _indiceAtual,
+                      onTap: (indice) {
+                        setState(() {
+                          _indiceAtual = indice;
+                        });
+
+                        if (indice == 1) {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(20),
+                              ),
+                            ),
+                            builder: (context) => const RelatorioModal(),
+                          );
+                        }
+                        if (indice == 3) {
+                        } else if (indice == 4) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const DetalhesPerfil(),
+                            ),
+                          );
+                        }
+                      },
+                      selectedItemColor: Colors.white,
+                      unselectedItemColor: Colors.white60,
+                      showSelectedLabels: false,
+                      showUnselectedLabels: false,
+                      type: BottomNavigationBarType.fixed,
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      iconSize: 28,
+                      items: [
+                        BottomNavigationBarItem(
+                          icon: Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: const Icon(Icons.bookmark_border),
                           ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.home,
-                        color: Color.fromRGBO(27, 79, 138, 1),
-                        size: 38,
-                      ),
+                          activeIcon: Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: const Icon(Icons.bookmark),
+                          ),
+                          label: '',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: const Icon(Icons.download_outlined),
+                          ),
+                          activeIcon: Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: const Icon(Icons.download),
+                          ),
+                          label: '',
+                        ),
+                        const BottomNavigationBarItem(
+                          icon: SizedBox(width: 40),
+                          label: '',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: const Icon(Icons.list_alt_outlined),
+                          ),
+                          activeIcon: Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: const Icon(Icons.list_alt),
+                          ),
+                          label: '',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: const Icon(Icons.person_outline),
+                          ),
+                          activeIcon: Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: const Icon(Icons.person),
+                          ),
+                          label: '',
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ),
+                Positioned(
+                  bottom: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(22),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.home,
+                      color: Color.fromRGBO(27, 79, 138, 1),
+                      size: 38,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.all(20),
@@ -286,7 +315,7 @@ class _HomePageState extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'April',
+                    'Abril',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -386,7 +415,6 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       SizedBox(height: 15),
-                      Icon(Icons.arrow_forward_ios, size: 30),
                     ],
                   ),
                 ],

@@ -3,6 +3,7 @@ import 'package:servicedesk/login/login_page.dart';
 import 'package:servicedesk/login/cadastro_page.dart';
 import 'package:servicedesk/login/esqueci_senha_page.dart';
 import 'package:servicedesk/login/redefinir_senha_page.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const ServiceDesk());
@@ -15,7 +16,10 @@ class ServiceDesk extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primaryColor: Color.fromRGBO(27, 79, 138, 1)),
+      theme: ThemeData(
+        primaryColor: Color.fromRGBO(27, 79, 138, 1),
+        //textTheme: GoogleFonts.leagueSpartanTextTheme(),
+      ),
       initialRoute: '/',
       routes: {
         '/': (context) => LoginPage(),

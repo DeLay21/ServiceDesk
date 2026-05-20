@@ -123,55 +123,89 @@ class _LoginPageState extends State<LoginPage> {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                 onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => EsqueciSenhaPage(),
-                    ),
-                  );
-                },
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => EsqueciSenhaPage(),
+                      ),
+                    );
+                  },
                   child: const Text(
                     'Esqueci a senha',
                     style: TextStyle(color: Color(0xFFAAAAAA), fontSize: 13),
                   ),
                 ),
               ),
-
               const SizedBox(height: 8),
+              Center(
+                child: SizedBox(
+                  width: 200,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      print('Email: ${emailController.text}');
+                      print('Senha: ${senhaController.text}');
 
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () {
-                    print('Email: ${emailController.text}');
-                    print('Senha: ${senhaController.text}');
-
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const HomePage()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1B2D6B),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HomePage(),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1B2D6B),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      elevation: 0,
                     ),
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    'Log In',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                    child: const Text(
+                      'Log In',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
               ),
-
+              const SizedBox(height: 24),
+              const Text('Ou faça login com', style: TextStyle(fontSize: 13)),
+              const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8EEFF),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.g_mobiledata,
+                      size: 28,
+                      color: Color(0xFF1B2D6B),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8EEFF),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.facebook,
+                      size: 28,
+                      color: Color(0xFF1B2D6B),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Column(
                 children: [
                   const Text(
                     'Não tem uma conta?',
@@ -180,9 +214,7 @@ class _LoginPageState extends State<LoginPage> {
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => CadastroPage(),
-                        ),
+                        MaterialPageRoute(builder: (context) => CadastroPage()),
                       );
                     },
                     child: const Text(
@@ -196,7 +228,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 32),
             ],
           ),
         ),
