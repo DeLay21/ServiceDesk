@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "845972064283",
+    "project_id": "servicedesk-704ec",
+    "storage_bucket": "servicedesk-704ec.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:845972064283:android:435e94bba21ee5d43790be",
+        "android_client_info": {
+          "package_name": "com.example.servicedesk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "845972064283-5lmik38uua0hcfht9c94m8ocvk1g0c9c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDH1FbpqlNL9B8iAWz6HjVx_o2TKbQ9UPk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "845972064283-5lmik38uua0hcfht9c94m8ocvk1g0c9c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 class Agendamento {
   String cliente;
   String pedido;
   DateTime? data;
   TimeOfDay? horario;
   bool concluida;
+  String usuario_logado;
 
   Agendamento({
     required this.cliente,
@@ -13,6 +15,7 @@ class Agendamento {
     this.data,
     this.horario,
     this.concluida = false,
+    required this.usuario_logado,
   });
 
   Map<String, dynamic> toMap() => {
@@ -21,6 +24,7 @@ class Agendamento {
     'data': data?.toIso8601String(),
     'horario': horario != null ? '${horario!.hour}:${horario!.minute}' : null,
     'finalizada': concluida,
+    'usuario_logado': usuario_logado,
   };
 
   factory Agendamento.fromMap(Map<String, dynamic> map) => Agendamento(
@@ -34,6 +38,7 @@ class Agendamento {
           )
         : null,
     concluida: map['concluida'] as bool,
+    usuario_logado: (map['usuario_logado'] ?? '') as String,
   );
 }
 
@@ -52,21 +57,37 @@ class _AgendamentoModalState extends State<AgendamentoModal> {
   final TextEditingController _dataController = TextEditingController();
   final TextEditingController _horarioController = TextEditingController();
 
+  Future<void> _salvarFireStore(Agendamento agendamento) async {
+    try{
+      await FirebaseFirestore.instance.collection('agendamentos').add(agendamento.toMap());
+
+    } catch (e) {
+      debugPrint('Erro ao tentar salvar: $e');
+    }
+  }
+
   void _salvar() {
     if (_clienteController.text.isNotEmpty &&
         _pedidoController.text.isNotEmpty &&
         _dataController.text.isNotEmpty &&
         _horarioController.text.isNotEmpty) {
-      AgendamentoServiceDeskGlobal.add(
-        Agendamento(
-          cliente: _clienteController.text,
-          pedido: _pedidoController.text,
-          data: DateTime.now(),
-          horario: TimeOfDay.now(),
-          concluida: false,
-        ),
-      );
-      Navigator.pop(context); // fecha o modal
+
+      final User? usuarioAtual = FirebaseAuth.instance.currentUser;
+      final String emailLogado = usuarioAtual?.email ?? 'usuario@cliente.com.br';
+
+      final novoAgendamento = Agendamento(
+        cliente: _clienteController.text, 
+        pedido: _pedidoController.text, 
+        data: DateTime.now(),
+        horario: TimeOfDay.now(),
+        concluida: false,
+        usuario_logado: emailLogado,
+        );
+
+        AgendamentoServiceDeskGlobal.add(novoAgendamento);
+        _salvarFireStore(novoAgendamento);
+        Navigator.pop(context);
+
     }
   }
 
