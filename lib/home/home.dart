@@ -14,37 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  //bool _hoverHome = false;
   int _indiceAtual = 2;
-  Widget _CaixaDias(String dia, String semana, bool selecionado) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 28, vertical: 18),
-      decoration: BoxDecoration(
-        color: selecionado ? Color.fromRGBO(27, 79, 138, 1) : Colors.white,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        children: [
-          Text(
-            dia,
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: selecionado ? Colors.white : Colors.black,
-            ),
-          ),
-          Text(
-            semana,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: selecionado ? Colors.white : Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -303,41 +273,7 @@ class _HomePageState extends State<HomePage> {
             ),
             SizedBox(height: 20),
 
-            Container(
-              width: double.infinity,
-              height: 180,
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(232, 238, 247, 1),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Abril',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromRGBO(27, 79, 138, 1),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _CaixaDias('9', 'SEG', false),
-                      _CaixaDias('10', 'TER', false),
-                      _CaixaDias('11', 'QUA', true),
-                      _CaixaDias('12', 'QUI', false),
-                      _CaixaDias('13', 'SEX', false),
-                      _CaixaDias('14', 'SAB', false),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            const _AgendaWidget(),
 
             SizedBox(height: 20),
 
@@ -422,6 +358,151 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+class _AgendaWidget extends StatefulWidget {
+  const _AgendaWidget();
+
+  @override
+  State<_AgendaWidget> createState() => _AgendaWidgetState();
+}
+
+class _AgendaWidgetState extends State<_AgendaWidget> {
+  late DateTime _diaSelecionado;
+  bool _expandido = false;
+  late DateTime _mesExibido;
+
+  static const _meses = [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+  ];
+
+  static const _diasSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
+
+  @override
+  void initState() {
+    super.initState();
+    _diaSelecionado = DateTime.now();
+    _mesExibido = DateTime(DateTime.now().year, DateTime.now().month);
+  }
+
+  List<DateTime> get _proximosSete {
+    final hoje = DateTime.now();
+    return List.generate(7, (i) => hoje.add(Duration(days: i)));
+  }
+
+  bool _mesmodia(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
+
+  @override
+  Widget build(BuildContext context) {
+    final dias = _proximosSete;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color.fromRGBO(232, 238, 247, 1),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                _meses[_diaSelecionado.month - 1],
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromRGBO(27, 79, 138, 1),
+                ),
+              ),
+              GestureDetector(
+                onTap: () => setState(() => _expandido = !_expandido),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color.fromRGBO(27, 79, 138, 1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _expandido ? 'Recolher' : 'Expandir',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        _expandido ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final larguraCaixa = (constraints.maxWidth - 16) / 7;
+              return Row(
+                children: dias.map((dia) {
+                  final ativo = _mesmodia(dia, _diaSelecionado);
+                  return GestureDetector(
+                    onTap: () => setState(() => _diaSelecionado = dia),
+                    child: Container(
+                      width: larguraCaixa,
+                      margin: const EdgeInsets.symmetric(horizontal: 1),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: ativo
+                            ? const Color.fromRGBO(27, 79, 138, 1)
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${dia.day}',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: ativo ? Colors.white : Colors.black,
+                            ),
+                          ),
+                          Text(
+                            _diasSemana[dia.weekday % 7],
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: ativo ? Colors.white : Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              );
+            },
+          ),
+
+          
+        ],
       ),
     );
   }
