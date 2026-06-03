@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:servicedesk/config/detalhes_perfil.dart';
 import 'package:servicedesk/home/relatorio.dart';
@@ -14,6 +15,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   //bool _hoverHome = false;
   int _indiceAtual = 2;
   Widget _CaixaDias(String dia, String semana, bool selecionado) {
@@ -341,41 +343,57 @@ class _HomePageState extends State<HomePage> {
 
             SizedBox(height: 20),
 
-            Container(
-              padding: EdgeInsets.all(20),
-              width: 890,
-              height: 130,
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(232, 238, 247, 1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Color.fromRGBO(27, 79, 138, 1),
-                    child: Icon(Icons.person, color: Colors.white, size: 40),
-                  ),
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                .collection('agendamentos')
+                .snapshots(),
+              builder: (context, snapshots) {
+                if (!snapshots.hasData || snapshots.data!.docs.isEmpty) {
+                  return Text('Sem agendamento');
+                }
+                final docs = snapshots.data!.docs;
 
-                  SizedBox(width: 20),
-
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Isaac',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                return Column(
+                  children: docs.map((doc) {
+                    return Container(
+                      margin: EdgeInsets.only(bottom: 12),
+                      padding: EdgeInsets.all(20),
+                      width: 890,
+                      height: 130,
+                      decoration: BoxDecoration(
+                        color: Color.fromRGBO(232, 238, 247, 1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundColor: Color.fromRGBO(27, 79, 138, 1),
+                            child: Icon(Icons.person, color: Colors.white, size: 40),
                           ),
-                        ),
-                        Text('Furador de Bolo', style: TextStyle(fontSize: 16)),
 
-                        Container(
-                          padding: EdgeInsets.symmetric(
+                          SizedBox(width: 20),
+
+                          Expanded(child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                doc['cliente'],
+                                style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                doc['pedido'],
+                                style: TextStyle(
+                                  fontSize: 18,
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
                             horizontal: 8,
                             vertical: 2,
                           ),
@@ -384,41 +402,21 @@ class _HomePageState extends State<HomePage> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
-                            '15:00',
+                            doc['horario'],
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(27, 79, 138, 1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          '15/04',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
+                              )
+                            ],
+                          ))
+                        ],
                       ),
-                      SizedBox(height: 15),
-                    ],
-                  ),
-                ],
-              ),
+                    );
+                  }).toList(),
+                );
+              }
             ),
           ],
         ),
