@@ -15,15 +15,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-=======
 
-  //bool _hoverHome = false;
->>>>>>> 625cc60dfaab48f4ef45da31e6b69b0882d11f11
-=======
-  
->>>>>>> Stashed changes
   int _indiceAtual = 2;
 
   @override
