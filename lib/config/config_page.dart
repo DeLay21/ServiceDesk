@@ -68,7 +68,7 @@ class _ConfigPageState extends State<ConfigPage> {
             _carregando
                 ? const Center(
                     child: CircularProgressIndicator(),
-                  ) // ← enquanto carrega
+                  )
                 : Card(
                     color: const Color.fromRGBO(232, 238, 247, 1),
                     elevation: 0,
@@ -96,7 +96,6 @@ class _ConfigPageState extends State<ConfigPage> {
                                         color: Colors.black,
                                       ),
                                     ),
-                                    // ← só aparece se perfil incompleto
                                     if (!_perfilCompleto)
                                       const Text(
                                         'Complete seu perfil e se beneficie de uma experiência no aplicativo',
@@ -135,7 +134,7 @@ class _ConfigPageState extends State<ConfigPage> {
                             child: Text(
                               _perfilCompleto
                                   ? 'Ver Perfil'
-                                  : 'Complete seu perfil', // ← muda o texto
+                                  : 'Complete seu perfil',
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Color.fromRGBO(14, 51, 107, 1),
@@ -250,9 +249,8 @@ class _ConfigPageState extends State<ConfigPage> {
                 ),
                 onTap: () async {
                   await FirebaseAuth.instance
-                      .signOut(); // ← desloga do Firebase
+                      .signOut(); // desloga do Firebase
                   Navigator.pushAndRemoveUntil(
-                    // ← limpa toda a pilha de navegação
                     context,
                     MaterialPageRoute(builder: (context) => const LoginPage()),
                     (route) => false,

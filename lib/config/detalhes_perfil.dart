@@ -87,11 +87,11 @@ class _DetalhesPerfilState extends State<DetalhesPerfil> {
           child: const Text('Salvar'),
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(25.0),
         child: Column(
           crossAxisAlignment:
-              CrossAxisAlignment.start, // alinhamento a esquerda
+              CrossAxisAlignment.start,
           children: [
             Center(
               child: CircleAvatar(
