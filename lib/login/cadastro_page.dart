@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:servicedesk/home/home.dart';
 
 class CadastroPage extends StatefulWidget {
   const CadastroPage({super.key});
@@ -8,16 +11,15 @@ class CadastroPage extends StatefulWidget {
 }
 
 class _CadastroPageState extends State<CadastroPage> {
-
-  TextEditingController nomeController      = TextEditingController();
-  TextEditingController dataNascController  = TextEditingController();
-  TextEditingController emailController     = TextEditingController();
-  TextEditingController senhaController     = TextEditingController();
+  TextEditingController nomeController = TextEditingController();
+  TextEditingController dataNascController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController senhaController = TextEditingController();
   TextEditingController confirmarController = TextEditingController();
 
-  bool mostrarSenha     = false;
+  bool mostrarSenha = false;
   bool mostrarConfirmar = false;
-  bool aceitouTermos    = false;
+  bool aceitouTermos = false;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,11 @@ class _CadastroPageState extends State<CadastroPage> {
         backgroundColor: const Color(0xFFF0F4FF),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF1B2D6B), size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Color(0xFF1B2D6B),
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
@@ -45,7 +51,6 @@ class _CadastroPageState extends State<CadastroPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             const Text(
               'Nome Completo',
               style: TextStyle(
@@ -62,7 +67,10 @@ class _CadastroPageState extends State<CadastroPage> {
                 hintStyle: const TextStyle(color: Color(0xFFAAAAAA)),
                 filled: true,
                 fillColor: const Color(0xFFE8EEFF),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
@@ -89,7 +97,10 @@ class _CadastroPageState extends State<CadastroPage> {
                 hintStyle: const TextStyle(color: Color(0xFFAAAAAA)),
                 filled: true,
                 fillColor: const Color(0xFFE8EEFF),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
@@ -116,7 +127,10 @@ class _CadastroPageState extends State<CadastroPage> {
                 hintStyle: const TextStyle(color: Color(0xFFAAAAAA)),
                 filled: true,
                 fillColor: const Color(0xFFE8EEFF),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
@@ -143,7 +157,10 @@ class _CadastroPageState extends State<CadastroPage> {
                 hintStyle: const TextStyle(color: Color(0xFFAAAAAA)),
                 filled: true,
                 fillColor: const Color(0xFFE8EEFF),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
@@ -183,7 +200,10 @@ class _CadastroPageState extends State<CadastroPage> {
                 hintStyle: const TextStyle(color: Color(0xFFAAAAAA)),
                 filled: true,
                 fillColor: const Color(0xFFE8EEFF),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
@@ -252,7 +272,7 @@ class _CadastroPageState extends State<CadastroPage> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (!aceitouTermos) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -271,7 +291,37 @@ class _CadastroPageState extends State<CadastroPage> {
                     );
                     return;
                   }
-                  print('Cadastrando: ${emailController.text}');
+
+                  try {
+                    final credencial = await FirebaseAuth.instance
+                        .createUserWithEmailAndPassword(
+                          email: emailController.text.trim(),
+                          password: senhaController.text,
+                        );
+
+                    await FirebaseFirestore.instance
+                        .collection('usuarios')
+                        .doc(
+                          credencial.user!.uid,
+                        ) 
+                        .set({
+                          'nome': nomeController.text.trim(),
+                          'email': emailController.text.trim(),
+                          'dataNascimento': dataNascController.text.trim(),
+                          'sexo': '',
+                          'fotoPerfil': '',
+                          'criadoEm': FieldValue.serverTimestamp(),
+                        });
+
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HomePage()),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Erro ao cadastrar: $e')),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1B2D6B),

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:servicedesk/config/detalhes_perfil.dart';
 import 'package:servicedesk/home/relatorio.dart';
@@ -15,9 +16,28 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
+  String _nome = '';
   //bool _hoverHome = false;
   int _indiceAtual = 2;
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarPerfil();
+  }
+
+  Future<void> _carregarPerfil() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final doc = await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(uid)
+        .get();
+
+    setState(() {
+      _nome = doc['nome'] ?? '';
+    });
+  }
+
   Widget _CaixaDias(String dia, String semana, bool selecionado) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 28, vertical: 18),
@@ -243,7 +263,7 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Isaac Kerllon',
+                      _nome,
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -345,8 +365,8 @@ class _HomePageState extends State<HomePage> {
 
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
-                .collection('agendamentos')
-                .snapshots(),
+                  .collection('agendamentos')
+                  .snapshots(),
               builder: (context, snapshots) {
                 if (!snapshots.hasData || snapshots.data!.docs.isEmpty) {
                   return Text('Sem agendamento');
@@ -370,53 +390,57 @@ class _HomePageState extends State<HomePage> {
                           CircleAvatar(
                             radius: 30,
                             backgroundColor: Color.fromRGBO(27, 79, 138, 1),
-                            child: Icon(Icons.person, color: Colors.white, size: 40),
+                            child: Icon(
+                              Icons.person,
+                              color: Colors.white,
+                              size: 40,
+                            ),
                           ),
 
                           SizedBox(width: 20),
 
-                          Expanded(child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                doc['cliente'],
-                                style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  doc['cliente'],
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                doc['pedido'],
-                                style: TextStyle(
-                                  fontSize: 18,
+                                Text(
+                                  doc['pedido'],
+                                  style: TextStyle(fontSize: 18),
                                 ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Color.fromRGBO(27, 79, 138, 1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            doc['horario'],
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Color.fromRGBO(27, 79, 138, 1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    doc['horario'],
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                              )
-                            ],
-                          ))
                         ],
                       ),
                     );
                   }).toList(),
                 );
-              }
+              },
             ),
           ],
         ),
