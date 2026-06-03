@@ -4,6 +4,8 @@ import 'package:servicedesk/config/gerenc_senha.dart';
 import 'package:servicedesk/config/notificacoes_page.dart';
 import 'package:servicedesk/config/politica_page.dart';
 import 'package:servicedesk/login/login_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ConfigPage extends StatefulWidget {
   const ConfigPage({super.key});
@@ -13,9 +15,28 @@ class ConfigPage extends StatefulWidget {
 }
 
 class _ConfigPageState extends State<ConfigPage> {
+  String _nome = '';
+  bool _perfilCompleto = false;
+  bool _carregando = true;
+
   @override
-  void dispose() {
-    super.dispose();
+  void initState() {
+    super.initState();
+    _carregarPerfil();
+  }
+
+  Future<void> _carregarPerfil() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final doc = await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(uid)
+        .get();
+
+    setState(() {
+      _nome = doc['nome'] ?? '';
+      _perfilCompleto = (doc['sexo'] ?? '').toString().isNotEmpty;
+      _carregando = false;
+    });
   }
 
   @override
@@ -44,76 +65,88 @@ class _ConfigPageState extends State<ConfigPage> {
         child: Column(
           //mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Card(
-              color: const Color.fromRGBO(232, 238, 247, 1),
-              elevation: 0,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.person,
-                          size: 80,
-                          color: Color.fromRGBO(14, 51, 107, 1),
-                        ),
-                        const SizedBox(width: 16), //espaço
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              Text(
-                                'Carla Meneses',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                ),
+            _carregando
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  ) // ← enquanto carrega
+                : Card(
+                    color: const Color.fromRGBO(232, 238, 247, 1),
+                    elevation: 0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.person,
+                                size: 80,
+                                color: Color.fromRGBO(14, 51, 107, 1),
                               ),
-                              Text(
-                                'Complete seu perfil e se beneficie de uma experiência no aplicativo',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Color.fromRGBO(138, 155, 181, 2),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _nome, // ← nome do Firebase
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    // ← só aparece se perfil incompleto
+                                    if (!_perfilCompleto)
+                                      const Text(
+                                        'Complete seu perfil e se beneficie de uma experiência no aplicativo',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Color.fromRGBO(
+                                            138,
+                                            155,
+                                            181,
+                                            2,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                    const Divider(
-                      height: 20,
-                      thickness: 1,
-                      indent: 20,
-                      endIndent: 0,
-                      color: Color.fromRGBO(197, 206, 220, 0.996),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const DetalhesPerfil(),
+                          const Divider(
+                            height: 20,
+                            thickness: 1,
+                            indent: 20,
+                            color: Color.fromRGBO(197, 206, 220, 0.996),
                           ),
-                        );
-                      },
-                      mouseCursor: SystemMouseCursors.click, 
-                      hoverColor: Colors.transparent, // pra tirar essas decorações
-                      child: const Text(
-                        'Complete seu perfil',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromRGBO(14, 51, 107, 1),
-                          fontSize: 16,
-                        ),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const DetalhesPerfil(),
+                                ),
+                              ).then((_) => _carregarPerfil());
+                            },
+                            mouseCursor: SystemMouseCursors.click,
+                            hoverColor: Colors.transparent,
+                            child: Text(
+                              _perfilCompleto
+                                  ? 'Ver Perfil'
+                                  : 'Complete seu perfil', // ← muda o texto
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color.fromRGBO(14, 51, 107, 1),
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
+                  ),
             const SizedBox(height: 25), //espaço
             Card(
               color: const Color.fromRGBO(232, 238, 247, 1),
@@ -215,12 +248,14 @@ class _ConfigPageState extends State<ConfigPage> {
                   color: Color.fromRGBO(14, 51, 107, 1),
                   size: 16,
                 ),
-                onTap: () {
-                  Navigator.push(
+                onTap: () async {
+                  await FirebaseAuth.instance
+                      .signOut(); // ← desloga do Firebase
+                  Navigator.pushAndRemoveUntil(
+                    // ← limpa toda a pilha de navegação
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const LoginPage(),
-                    ),
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                    (route) => false,
                   );
                 },
               ),
@@ -231,6 +266,3 @@ class _ConfigPageState extends State<ConfigPage> {
     );
   }
 }
-
-
-

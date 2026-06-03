@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DetalhesPerfil extends StatefulWidget {
   const DetalhesPerfil({super.key});
@@ -8,12 +10,49 @@ class DetalhesPerfil extends StatefulWidget {
 }
 
 class _DetalhesPerfilState extends State<DetalhesPerfil> {
+  TextEditingController nomeController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController sexoController = TextEditingController();
+  TextEditingController dataNascController = TextEditingController();
+
   @override
-  void dispose() {
-    super.dispose();
+  void initState() {
+    super.initState();
+    _carregarPerfil();
   }
 
-  void _salvar() {}
+  Future<void> _carregarPerfil() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final doc = await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(uid)
+        .get();
+
+    setState(() {
+      nomeController.text = doc['nome'] ?? '';
+      emailController.text = doc['email'] ?? '';
+      sexoController.text = (doc['sexo'] ?? '');
+      dataNascController.text = doc['dataNascimento'] ?? '';
+    });
+  }
+
+  Future<void> _salvar() async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser!.uid;
+      await FirebaseFirestore.instance.collection('usuarios').doc(uid).update({
+        'nome': nomeController.text.trim(),
+        'email': emailController.text.trim(),
+        'sexo': sexoController.text.trim(),
+        'dataNascimento': dataNascController.text.trim(),
+      });
+
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erro ao salvar: $e')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +112,7 @@ class _DetalhesPerfilState extends State<DetalhesPerfil> {
               ),
             ),
             TextField(
-              //controller: _emailController,
+              controller: nomeController,
               decoration: InputDecoration(
                 //labelText: 'Qual é seu nome?',
                 filled: true,
@@ -93,7 +132,7 @@ class _DetalhesPerfilState extends State<DetalhesPerfil> {
               ),
             ),
             TextField(
-              //controller: _emailController,
+              controller: emailController,
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
                 //labelText: 'Qual é seu Email?',
@@ -114,7 +153,7 @@ class _DetalhesPerfilState extends State<DetalhesPerfil> {
               ),
             ),
             TextField(
-              //controller: _emailController,
+              controller: sexoController,
               decoration: InputDecoration(
                 //labelText: 'Qual é seu nome?',
                 filled: true,
@@ -134,7 +173,7 @@ class _DetalhesPerfilState extends State<DetalhesPerfil> {
               ),
             ),
             TextField(
-              //controller: _emailController,
+              controller: dataNascController,
               keyboardType: TextInputType.datetime,
               decoration: InputDecoration(
                 //labelText: 'Qual é seu Email?',

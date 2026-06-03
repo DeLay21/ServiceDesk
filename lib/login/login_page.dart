@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:servicedesk/login/cadastro_page.dart';
 import 'package:servicedesk/login/esqueci_senha_page.dart';
@@ -142,16 +144,37 @@ class _LoginPageState extends State<LoginPage> {
                   width: 200,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: () {
-                      print('Email: ${emailController.text}');
-                      print('Senha: ${senhaController.text}');
+                    onPressed: () async {
+                      try {
+                        final credencial = await FirebaseAuth.instance
+                            .signInWithEmailAndPassword(
+                              email: emailController.text.trim(),
+                              password: senhaController.text,
+                            );
 
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const HomePage(),
-                        ),
-                      );
+                        final doc = await FirebaseFirestore.instance
+                            .collection('usuarios')
+                            .doc(credencial.user!.uid)
+                            .get();
+
+                        print(
+                          'Bem-vindo: ${doc['nome']}',
+                        );
+
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const HomePage(),
+                          ),
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('E-mail ou senha incorretos'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1B2D6B),
