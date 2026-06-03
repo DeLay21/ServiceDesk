@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:servicedesk/config/detalhes_perfil.dart';
 import 'package:servicedesk/home/relatorio.dart';
@@ -14,6 +15,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+<<<<<<< Updated upstream
+<<<<<<< HEAD
+=======
+
+  //bool _hoverHome = false;
+>>>>>>> 625cc60dfaab48f4ef45da31e6b69b0882d11f11
+=======
+  
+>>>>>>> Stashed changes
   int _indiceAtual = 2;
 
   @override
@@ -277,41 +287,57 @@ class _HomePageState extends State<HomePage> {
 
             SizedBox(height: 20),
 
-            Container(
-              padding: EdgeInsets.all(20),
-              width: 890,
-              height: 130,
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(232, 238, 247, 1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Color.fromRGBO(27, 79, 138, 1),
-                    child: Icon(Icons.person, color: Colors.white, size: 40),
-                  ),
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                .collection('agendamentos')
+                .snapshots(),
+              builder: (context, snapshots) {
+                if (!snapshots.hasData || snapshots.data!.docs.isEmpty) {
+                  return Text('Sem agendamento');
+                }
+                final docs = snapshots.data!.docs;
 
-                  SizedBox(width: 20),
-
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Isaac',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                return Column(
+                  children: docs.map((doc) {
+                    return Container(
+                      margin: EdgeInsets.only(bottom: 12),
+                      padding: EdgeInsets.all(20),
+                      width: 890,
+                      height: 130,
+                      decoration: BoxDecoration(
+                        color: Color.fromRGBO(232, 238, 247, 1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundColor: Color.fromRGBO(27, 79, 138, 1),
+                            child: Icon(Icons.person, color: Colors.white, size: 40),
                           ),
-                        ),
-                        Text('Furador de Bolo', style: TextStyle(fontSize: 16)),
 
-                        Container(
-                          padding: EdgeInsets.symmetric(
+                          SizedBox(width: 20),
+
+                          Expanded(child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                doc['cliente'],
+                                style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                doc['pedido'],
+                                style: TextStyle(
+                                  fontSize: 18,
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
                             horizontal: 8,
                             vertical: 2,
                           ),
@@ -320,41 +346,21 @@ class _HomePageState extends State<HomePage> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
-                            '15:00',
+                            doc['horario'],
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(27, 79, 138, 1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          '15/04',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
+                              )
+                            ],
+                          ))
+                        ],
                       ),
-                      SizedBox(height: 15),
-                    ],
-                  ),
-                ],
-              ),
+                    );
+                  }).toList(),
+                );
+              }
             ),
           ],
         ),
@@ -501,9 +507,154 @@ class _AgendaWidgetState extends State<_AgendaWidget> {
             },
           ),
 
-          
+          if (_expandido) ...[
+            const SizedBox(height: 16),
+            const Divider(color: Color.fromRGBO(27, 79, 138, 0.2)),
+            const SizedBox(height: 8),
+            _CalendarioCompleto(
+              mesExibido: _mesExibido,
+              diaSelecionado: _diaSelecionado,
+              onMesAnterior: () => setState(
+                  () => _mesExibido = DateTime(_mesExibido.year, _mesExibido.month - 1)),
+              onProximoMes: () => setState(
+                  () => _mesExibido = DateTime(_mesExibido.year, _mesExibido.month + 1)),
+              onDiaSelecionado: (d) => setState(() => _diaSelecionado = d),
+            ),
+          ],
         ],
       ),
+    );
+  }
+}
+
+class _CalendarioCompleto extends StatelessWidget {
+  final DateTime mesExibido;
+  final DateTime diaSelecionado;
+  final VoidCallback onMesAnterior;
+  final VoidCallback onProximoMes;
+  final ValueChanged<DateTime> onDiaSelecionado;
+
+  static const _meses = [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+  ];
+  static const _cab = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+
+  const _CalendarioCompleto({
+    required this.mesExibido,
+    required this.diaSelecionado,
+    required this.onMesAnterior,
+    required this.onProximoMes,
+    required this.onDiaSelecionado,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hoje = DateTime.now();
+    final primeiro = DateTime(mesExibido.year, mesExibido.month, 1);
+    final ultimo = DateTime(mesExibido.year, mesExibido.month + 1, 0);
+    final offset = primeiro.weekday % 7;
+    final linhas = ((offset + ultimo.day) / 7).ceil();
+
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.chevron_left,
+                  color: Color.fromRGBO(27, 79, 138, 1)),
+              onPressed: onMesAnterior,
+            ),
+            Text(
+              '${_meses[mesExibido.month - 1]} ${mesExibido.year}',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color.fromRGBO(27, 79, 138, 1),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.chevron_right,
+                  color: Color.fromRGBO(27, 79, 138, 1)),
+              onPressed: onProximoMes,
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: _cab
+              .map((d) => SizedBox(
+                    width: 32,
+                    child: Center(
+                      child: Text(
+                        d,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromRGBO(27, 79, 138, 0.6),
+                        ),
+                      ),
+                    ),
+                  ))
+              .toList(),
+        ),
+        const SizedBox(height: 4),
+        ...List.generate(linhas, (linha) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(7, (col) {
+              final indice = linha * 7 + col;
+              final dia = indice - offset + 1;
+              if (dia < 1 || dia > ultimo.day) {
+                return const SizedBox(width: 32, height: 32);
+              }
+              final data = DateTime(mesExibido.year, mesExibido.month, dia);
+              final isHoje = data.year == hoje.year &&
+                  data.month == hoje.month &&
+                  data.day == hoje.day;
+              final isSel = data.year == diaSelecionado.year &&
+                  data.month == diaSelecionado.month &&
+                  data.day == diaSelecionado.day;
+              return GestureDetector(
+                onTap: () => onDiaSelecionado(data),
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  margin: const EdgeInsets.symmetric(vertical: 2),
+                  decoration: BoxDecoration(
+                    color: isSel
+                        ? const Color.fromRGBO(27, 79, 138, 1)
+                        : isHoje
+                            ? const Color.fromRGBO(27, 79, 138, 0.15)
+                            : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                    border: isHoje && !isSel
+                        ? Border.all(
+                            color: const Color.fromRGBO(27, 79, 138, 0.5),
+                            width: 1,
+                          )
+                        : null,
+                  ),
+                  child: Center(
+                    child: Text(
+                      '$dia',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: isHoje || isSel
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                        color: isSel
+                            ? Colors.white
+                            : const Color.fromRGBO(27, 79, 138, 1),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          );
+        }),
+      ],
     );
   }
 }
