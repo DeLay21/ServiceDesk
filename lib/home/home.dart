@@ -18,11 +18,22 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String _nome = '';
   int _indiceAtual = 2;
+  final TextEditingController _buscaController = TextEditingController();
+  String _filtroBusca = '';
 
   @override
   void initState() {
     super.initState();
     _carregarPerfil();
+    _buscaController.addListener(() {
+      setState(() => _filtroBusca = _buscaController.text.trim().toLowerCase());
+    });
+  }
+
+  @override
+  void dispose() {
+    _buscaController.dispose();
+    super.dispose();
   }
 
   Future<void> _carregarPerfil() async {
@@ -37,36 +48,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Widget _CaixaDias(String dia, String semana, bool selecionado) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 28, vertical: 18),
-      decoration: BoxDecoration(
-        color: selecionado ? Color.fromRGBO(27, 79, 138, 1) : Colors.white,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        children: [
-          Text(
-            dia,
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: selecionado ? Colors.white : Colors.black,
-            ),
-          ),
-          Text(
-            semana,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: selecionado ? Colors.white : Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -309,11 +290,12 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             SizedBox(height: 20),
-
             TextField(
+              controller: _buscaController,
               decoration: InputDecoration(
                 prefixIcon: Icon(Icons.tune),
                 suffixIcon: Icon(Icons.search),
+                hintText: 'Buscar por cliente...',
                 filled: true,
                 fillColor: Color.fromRGBO(232, 238, 247, 1),
                 border: OutlineInputBorder(
@@ -323,11 +305,27 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             SizedBox(height: 20),
-
-            const _AgendaWidget(),
-
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('agendamentos')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                final datasComAgendamento = <DateTime>{};
+                if (snapshot.hasData) {
+                  for (final doc in snapshot.data!.docs) {
+                    final dataStr = doc['data'] as String?;
+                    if (dataStr != null) {
+                      try {
+                        final d = DateTime.parse(dataStr);
+                        datasComAgendamento.add(DateTime(d.year, d.month, d.day));
+                      } catch (_) {}
+                    }
+                  }
+                }
+                return _AgendaWidget(datasComAgendamento: datasComAgendamento);
+              },
+            ),
             SizedBox(height: 20),
-
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('agendamentos')
@@ -336,8 +334,20 @@ class _HomePageState extends State<HomePage> {
                 if (!snapshots.hasData || snapshots.data!.docs.isEmpty) {
                   return Text('Sem agendamento');
                 }
-                final docs = snapshots.data!.docs;
-
+                final docs = snapshots.data!.docs.where((doc) {
+                  if (_filtroBusca.isEmpty) return true;
+                  final cliente = (doc['cliente'] as String? ?? '').toLowerCase();
+                  return cliente.contains(_filtroBusca);
+                }).toList();
+                if (docs.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: Text(
+                      'Nenhum cliente encontrado.',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  );
+                }
                 return Column(
                   children: docs.map((doc) {
                     return Container(
@@ -361,9 +371,7 @@ class _HomePageState extends State<HomePage> {
                               size: 40,
                             ),
                           ),
-
                           SizedBox(width: 20),
-
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -390,7 +398,7 @@ class _HomePageState extends State<HomePage> {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Text(
-                                    doc['horario'],
+                                    doc['horario'] ?? '',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
@@ -414,43 +422,37 @@ class _HomePageState extends State<HomePage> {
   }
 }
 class _AgendaWidget extends StatefulWidget {
-  const _AgendaWidget();
+  final Set<DateTime> datasComAgendamento;
+  const _AgendaWidget({required this.datasComAgendamento});
 
   @override
   State<_AgendaWidget> createState() => _AgendaWidgetState();
 }
-
 class _AgendaWidgetState extends State<_AgendaWidget> {
-  late DateTime _diaSelecionado;
   bool _expandido = false;
   late DateTime _mesExibido;
-
   static const _meses = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
   ];
-
   static const _diasSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
 
   @override
   void initState() {
     super.initState();
-    _diaSelecionado = DateTime.now();
     _mesExibido = DateTime(DateTime.now().year, DateTime.now().month);
   }
-
   List<DateTime> get _proximosSete {
     final hoje = DateTime.now();
     return List.generate(7, (i) => hoje.add(Duration(days: i)));
   }
-
-  bool _mesmodia(DateTime a, DateTime b) =>
-      a.year == b.year && a.month == b.month && a.day == b.day;
+  bool _temAgendamento(DateTime dia) =>
+      widget.datasComAgendamento.contains(DateTime(dia.year, dia.month, dia.day));
 
   @override
   Widget build(BuildContext context) {
     final dias = _proximosSete;
-
+    final mesAtual = _meses[DateTime.now().month - 1];
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -465,7 +467,7 @@ class _AgendaWidgetState extends State<_AgendaWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                _meses[_diaSelecionado.month - 1],
+                mesAtual,
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -503,67 +505,60 @@ class _AgendaWidgetState extends State<_AgendaWidget> {
               ),
             ],
           ),
-
           const SizedBox(height: 20),
-
           LayoutBuilder(
             builder: (context, constraints) {
               final larguraCaixa = (constraints.maxWidth - 16) / 7;
               return Row(
                 children: dias.map((dia) {
-                  final ativo = _mesmodia(dia, _diaSelecionado);
-                  return GestureDetector(
-                    onTap: () => setState(() => _diaSelecionado = dia),
-                    child: Container(
-                      width: larguraCaixa,
-                      margin: const EdgeInsets.symmetric(horizontal: 1),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color: ativo
-                            ? const Color.fromRGBO(27, 79, 138, 1)
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '${dia.day}',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: ativo ? Colors.white : Colors.black,
-                            ),
+                  final comAgendamento = _temAgendamento(dia);
+                  return Container(
+                    width: larguraCaixa,
+                    margin: const EdgeInsets.symmetric(horizontal: 1),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: comAgendamento
+                          ? const Color.fromRGBO(27, 79, 138, 1)
+                          : Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${dia.day}',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: comAgendamento ? Colors.white : Colors.black,
                           ),
-                          Text(
-                            _diasSemana[dia.weekday % 7],
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: ativo ? Colors.white : Colors.black,
-                            ),
+                        ),
+                        Text(
+                          _diasSemana[dia.weekday % 7],
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: comAgendamento ? Colors.white : Colors.black,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   );
                 }).toList(),
               );
             },
           ),
-
           if (_expandido) ...[
             const SizedBox(height: 16),
             const Divider(color: Color.fromRGBO(27, 79, 138, 0.2)),
             const SizedBox(height: 8),
-            _CalendarioCompleto(
+            _Calendario(
               mesExibido: _mesExibido,
-              diaSelecionado: _diaSelecionado,
+              datasComAgendamento: widget.datasComAgendamento,
               onMesAnterior: () => setState(
                   () => _mesExibido = DateTime(_mesExibido.year, _mesExibido.month - 1)),
               onProximoMes: () => setState(
                   () => _mesExibido = DateTime(_mesExibido.year, _mesExibido.month + 1)),
-              onDiaSelecionado: (d) => setState(() => _diaSelecionado = d),
             ),
           ],
         ],
@@ -571,27 +566,24 @@ class _AgendaWidgetState extends State<_AgendaWidget> {
     );
   }
 }
-
-class _CalendarioCompleto extends StatelessWidget {
+class _Calendario extends StatelessWidget {
   final DateTime mesExibido;
-  final DateTime diaSelecionado;
+  final Set<DateTime> datasComAgendamento;
   final VoidCallback onMesAnterior;
   final VoidCallback onProximoMes;
-  final ValueChanged<DateTime> onDiaSelecionado;
-
   static const _meses = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
   ];
   static const _cab = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
-
-  const _CalendarioCompleto({
+  const _Calendario({
     required this.mesExibido,
-    required this.diaSelecionado,
+    required this.datasComAgendamento,
     required this.onMesAnterior,
     required this.onProximoMes,
-    required this.onDiaSelecionado,
   });
+  bool _temAgendamento(DateTime dia) =>
+      datasComAgendamento.contains(DateTime(dia.year, dia.month, dia.day));
 
   @override
   Widget build(BuildContext context) {
@@ -600,7 +592,6 @@ class _CalendarioCompleto extends StatelessWidget {
     final ultimo = DateTime(mesExibido.year, mesExibido.month + 1, 0);
     final offset = primeiro.weekday % 7;
     final linhas = ((offset + ultimo.day) / 7).ceil();
-
     return Column(
       children: [
         Row(
@@ -657,41 +648,37 @@ class _CalendarioCompleto extends StatelessWidget {
               final isHoje = data.year == hoje.year &&
                   data.month == hoje.month &&
                   data.day == hoje.day;
-              final isSel = data.year == diaSelecionado.year &&
-                  data.month == diaSelecionado.month &&
-                  data.day == diaSelecionado.day;
-              return GestureDetector(
-                onTap: () => onDiaSelecionado(data),
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  margin: const EdgeInsets.symmetric(vertical: 2),
-                  decoration: BoxDecoration(
-                    color: isSel
-                        ? const Color.fromRGBO(27, 79, 138, 1)
-                        : isHoje
-                            ? const Color.fromRGBO(27, 79, 138, 0.15)
-                            : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                    border: isHoje && !isSel
-                        ? Border.all(
-                            color: const Color.fromRGBO(27, 79, 138, 0.5),
-                            width: 1,
-                          )
-                        : null,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '$dia',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: isHoje || isSel
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                        color: isSel
-                            ? Colors.white
-                            : const Color.fromRGBO(27, 79, 138, 1),
-                      ),
+              final comAgendamento = _temAgendamento(data);
+
+              return Container(
+                width: 32,
+                height: 32,
+                margin: const EdgeInsets.symmetric(vertical: 2),
+                decoration: BoxDecoration(
+                  color: comAgendamento
+                      ? const Color.fromRGBO(27, 79, 138, 1)
+                      : isHoje
+                          ? const Color.fromRGBO(27, 79, 138, 0.15)
+                          : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                  border: isHoje && !comAgendamento
+                      ? Border.all(
+                          color: const Color.fromRGBO(27, 79, 138, 0.5),
+                          width: 1,
+                        )
+                      : null,
+                ),
+                child: Center(
+                  child: Text(
+                    '$dia',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: isHoje || comAgendamento
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color: comAgendamento
+                          ? Colors.white
+                          : const Color.fromRGBO(27, 79, 138, 1),
                     ),
                   ),
                 ),
