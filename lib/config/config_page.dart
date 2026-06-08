@@ -4,8 +4,6 @@ import 'package:servicedesk/config/gerenc_senha.dart';
 import 'package:servicedesk/config/notificacoes_page.dart';
 import 'package:servicedesk/config/politica_page.dart';
 import 'package:servicedesk/login/login_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:servicedesk/service/usuario_service.dart';
 
 class ConfigPage extends StatefulWidget {
