@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:servicedesk/service/usuario_service.dart';
+import 'package:servicedesk/login/esqueci_senha_page.dart';
 
 class GerencSenha extends StatefulWidget {
   const GerencSenha({super.key});
@@ -135,7 +136,14 @@ class _GerencSenhaState extends State<GerencSenha> {
             Align(
               alignment: Alignment.centerRight,
               child: InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const EsqueciSenhaPage(),
+                    ),
+                  );
+                },
                 mouseCursor: SystemMouseCursors.click,
                 hoverColor: Colors.transparent,
                 child: const Text(

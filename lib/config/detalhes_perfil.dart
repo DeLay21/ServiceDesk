@@ -233,18 +233,6 @@ class _DetalhesPerfilState extends State<DetalhesPerfil> {
                 ),
               ),
             ),
-            const SizedBox(height: 15),
-            Align(
-              alignment: Alignment.center,
-              child: Text(
-                'Essas informações serão usadas para identificar possíveis riscos de segurança relacionados ao seus medicamentos.',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromRGBO(117, 117, 117, 1),
-                  fontSize: 12,
-                ),
-              ),
-            ),
           ],
         ),
       ),
