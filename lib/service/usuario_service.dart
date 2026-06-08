@@ -26,6 +26,22 @@ class UsuarioService {
     await _db.collection('usuarios').doc(uid).set(dados);
   }
 
+  static Future<void> alterarSenha(String senhaAtual, String novaSenha) async {
+    try {
+      final user = _auth.currentUser!;
+
+      final credencial = EmailAuthProvider.credential(
+        email: user.email!,
+        password: senhaAtual,
+      );
+      await user.reauthenticateWithCredential(credencial);
+
+      await user.updatePassword(novaSenha);
+    } catch (e) {
+      throw Exception('Erro ao alterar: $e');
+    }
+  }
+
   static Future<void> deslogar() async {
     await _auth.signOut();
   }

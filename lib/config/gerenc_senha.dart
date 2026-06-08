@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:servicedesk/service/usuario_service.dart';
 
 class GerencSenha extends StatefulWidget {
   const GerencSenha({super.key});
@@ -13,12 +14,54 @@ class _GerencSenhaState extends State<GerencSenha> {
   bool _verNovaSenha = false;
   bool _verConfirmarNovaSenha = false;
 
+  TextEditingController _senhaAtualController = TextEditingController();
+  TextEditingController _novaSenhaController = TextEditingController();
+  TextEditingController _confirmarNovaSenhaController = TextEditingController();
+
   @override
   void dispose() {
     super.dispose();
   }
 
-  void _entrar() {}
+  void _alterar() async {
+    String novaSenha = _novaSenhaController.text;
+    String confirmar = _confirmarNovaSenhaController.text;
+
+    if (novaSenha != confirmar) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Confirmacao nao'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      await UsuarioService.alterarSenha(
+        _senhaAtualController.text,
+        _novaSenhaController.text,
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Senha alterada com sucesso!'),
+            backgroundColor: Color.fromRGBO(0, 168, 120, 1),
+          ),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Senha atual incorreta ou erro ao alterar.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext contex) {
@@ -50,7 +93,7 @@ class _GerencSenhaState extends State<GerencSenha> {
             backgroundColor: Color.fromRGBO(0, 168, 120, 1),
             foregroundColor: Colors.white,
           ),
-          onPressed: _entrar,
+          onPressed: _alterar,
           child: const Text('Mudar Senha'),
         ),
       ),
@@ -68,7 +111,7 @@ class _GerencSenhaState extends State<GerencSenha> {
               ),
             ),
             TextField(
-              //controller: _emailController,
+              controller: _senhaAtualController,
               obscureText: _verSenhaAtual ? false : true, //esconder senha
               decoration: InputDecoration(
                 filled: true,
@@ -114,7 +157,7 @@ class _GerencSenhaState extends State<GerencSenha> {
               ),
             ), // espaçamento
             TextField(
-              //controller: _emailController,
+              controller: _novaSenhaController,
               obscureText: _verNovaSenha ? false : true, //esconder senha
               decoration: InputDecoration(
                 filled: true,
@@ -144,7 +187,7 @@ class _GerencSenhaState extends State<GerencSenha> {
               ),
             ), // espaçamento
             TextField(
-              //controller: _emailController,
+              controller: _confirmarNovaSenhaController,
               obscureText: _verConfirmarNovaSenha
                   ? false
                   : true, //esconder senha
