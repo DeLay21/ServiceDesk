@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
+import 'package:servicedesk/service/usuario_service.dart';
 
 class DetalhesPerfil extends StatefulWidget {
   const DetalhesPerfil({super.key});
@@ -22,11 +22,7 @@ class _DetalhesPerfilState extends State<DetalhesPerfil> {
   }
 
   Future<void> _carregarPerfil() async {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-    final doc = await FirebaseFirestore.instance
-        .collection('usuarios')
-        .doc(uid)
-        .get();
+    final doc = await UsuarioService.buscarPerfil();
 
     setState(() {
       nomeController.text = doc['nome'] ?? '';
@@ -37,20 +33,42 @@ class _DetalhesPerfilState extends State<DetalhesPerfil> {
   }
 
   Future<void> _salvar() async {
+    final jaExisteEmail = await UsuarioService.existsByEmail(
+      emailController.text.trim(),
+    );
+
+    if (jaExisteEmail) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('O email inserido já está em uso!'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     try {
-      final uid = FirebaseAuth.instance.currentUser!.uid;
-      await FirebaseFirestore.instance.collection('usuarios').doc(uid).update({
+      await UsuarioService.atualizarPerfil({
         'nome': nomeController.text.trim(),
         'email': emailController.text.trim(),
         'sexo': sexoController.text.trim(),
         'dataNascimento': dataNascController.text.trim(),
       });
-
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Perfil atualizado com sucesso!'),
+            backgroundColor: Color.fromRGBO(0, 168, 120, 1),
+          ),
+        );
+        Navigator.pop(context);
+      }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erro ao salvar: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('$e')));
+      }
     }
   }
 
@@ -90,8 +108,7 @@ class _DetalhesPerfilState extends State<DetalhesPerfil> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(25.0),
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
               child: CircleAvatar(
@@ -113,8 +130,10 @@ class _DetalhesPerfilState extends State<DetalhesPerfil> {
             ),
             TextField(
               controller: nomeController,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[a-zA-ZÀ-ÿ\s]')),
+              ],
               decoration: InputDecoration(
-                //labelText: 'Qual é seu nome?',
                 filled: true,
                 fillColor: Color.fromRGBO(230, 241, 251, 1),
                 border: OutlineInputBorder(
@@ -152,17 +171,27 @@ class _DetalhesPerfilState extends State<DetalhesPerfil> {
                 color: Colors.black,
               ),
             ),
-            TextField(
-              controller: sexoController,
+            DropdownButtonFormField<String>(
+              initialValue: sexoController.text.isEmpty
+                  ? null
+                  : sexoController.text,
               decoration: InputDecoration(
-                //labelText: 'Qual é seu nome?',
                 filled: true,
-                fillColor: Color.fromRGBO(230, 241, 251, 1),
+                fillColor: const Color.fromRGBO(230, 241, 251, 1),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(13)),
                   borderSide: BorderSide.none,
                 ),
               ),
+              items: const [
+                DropdownMenuItem(value: 'M', child: Text('Masculino')),
+                DropdownMenuItem(value: 'F', child: Text('Feminino')),
+              ],
+              onChanged: (valor) {
+                setState(() {
+                  sexoController.text = valor ?? '';
+                });
+              },
             ),
             const SizedBox(height: 15),
             const Text(
@@ -172,16 +201,35 @@ class _DetalhesPerfilState extends State<DetalhesPerfil> {
                 color: Colors.black,
               ),
             ),
-            TextField(
-              controller: dataNascController,
-              keyboardType: TextInputType.datetime,
-              decoration: InputDecoration(
-                //labelText: 'Qual é seu Email?',
-                filled: true,
-                fillColor: Color.fromRGBO(230, 241, 251, 1),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(13)),
-                  borderSide: BorderSide.none,
+            InkWell(
+              onTap: () async {
+                final dataSelecionada = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime(2000),
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime.now(),
+                );
+                if (dataSelecionada != null) {
+                  setState(() {
+                    dataNascController.text =
+                        '${dataSelecionada.day.toString().padLeft(2, '0')}/'
+                        '${dataSelecionada.month.toString().padLeft(2, '0')}/'
+                        '${dataSelecionada.year}';
+                  });
+                }
+              },
+              child: IgnorePointer(
+                child: TextField(
+                  controller: dataNascController,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: const Color.fromRGBO(230, 241, 251, 1),
+                    border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(13)),
+                      borderSide: BorderSide.none,
+                    ),
+                    suffixIcon: const Icon(Icons.calendar_today, size: 18),
+                  ),
                 ),
               ),
             ),

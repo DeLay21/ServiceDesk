@@ -4,8 +4,7 @@ import 'package:servicedesk/config/gerenc_senha.dart';
 import 'package:servicedesk/config/notificacoes_page.dart';
 import 'package:servicedesk/config/politica_page.dart';
 import 'package:servicedesk/login/login_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:servicedesk/service/usuario_service.dart';
 
 class ConfigPage extends StatefulWidget {
   const ConfigPage({super.key});
@@ -26,12 +25,7 @@ class _ConfigPageState extends State<ConfigPage> {
   }
 
   Future<void> _carregarPerfil() async {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-    final doc = await FirebaseFirestore.instance
-        .collection('usuarios')
-        .doc(uid)
-        .get();
-
+    final doc = await UsuarioService.buscarPerfil();
     setState(() {
       _nome = doc['nome'] ?? '';
       _perfilCompleto = (doc['sexo'] ?? '').toString().isNotEmpty;
@@ -66,9 +60,7 @@ class _ConfigPageState extends State<ConfigPage> {
           //mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _carregando
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
+                ? const Center(child: CircularProgressIndicator())
                 : Card(
                     color: const Color.fromRGBO(232, 238, 247, 1),
                     elevation: 0,
@@ -248,8 +240,7 @@ class _ConfigPageState extends State<ConfigPage> {
                   size: 16,
                 ),
                 onTap: () async {
-                  await FirebaseAuth.instance
-                      .signOut(); // desloga do Firebase
+                  await UsuarioService.deslogar(); // desloga do Firebase
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(builder: (context) => const LoginPage()),
