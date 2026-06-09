@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:servicedesk/config/detalhes_perfil.dart';
 import 'package:servicedesk/home/relatorio.dart';
-import 'package:servicedesk/login/login_page.dart';
 import 'package:servicedesk/config/notificacoes_page.dart';
 import 'package:servicedesk/config/config_page.dart';
 import 'package:servicedesk/home/agendamento.dart';
