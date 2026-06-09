@@ -348,6 +348,7 @@ Future<void> _confirmarExclusao(BuildContext context, String docId) async {
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('agendamentos')
+                  .where('usuario_logado', isEqualTo: FirebaseAuth.instance.currentUser!.email)
                   .snapshots(),
               builder: (context, snapshot) {
                 final datasComAgendamento = <DateTime>{};
@@ -369,6 +370,7 @@ Future<void> _confirmarExclusao(BuildContext context, String docId) async {
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('agendamentos')
+                  .where('usuario_logado', isEqualTo: FirebaseAuth.instance.currentUser!.email)
                   .snapshots(),
               builder: (context, snapshots) {
                 if (!snapshots.hasData || snapshots.data!.docs.isEmpty) {
@@ -864,6 +866,7 @@ class _EditarAgendamentoModalState extends State<EditarAgendamentoModal> {
           .collection('agendamentos')
           .doc(widget.docId)
           .update({
+        'usario_logado': FirebaseAuth.instance.currentUser!.email,
         'cliente': _clienteController.text,
         'pedido': _pedidoController.text,
         'data': _dataSelecionada!.toIso8601String(),
