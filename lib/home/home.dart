@@ -48,6 +48,47 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+Future<void> _confirmarExclusao(BuildContext context, String docId) async {
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          'Excluir agendamento',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color.fromRGBO(27, 79, 138, 1),
+          ),
+        ),
+        content: const Text('Tem certeza que deseja excluir este agendamento?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Excluir'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar == true) {
+      await FirebaseFirestore.instance
+          .collection('agendamentos')
+          .doc(docId)
+          .delete();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -354,7 +395,7 @@ class _HomePageState extends State<HomePage> {
                       margin: EdgeInsets.only(bottom: 12),
                       padding: EdgeInsets.all(20),
                       width: 890,
-                      height: 130,
+                      height: 150,
                       decoration: BoxDecoration(
                         color: Color.fromRGBO(232, 238, 247, 1),
                         borderRadius: BorderRadius.circular(20),
@@ -408,6 +449,62 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                           ),
+                          // ✅ ADICIONADO: coluna com botões de editar e excluir
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // ✅ ADICIONADO: botão de editar
+                              GestureDetector(
+                                onTap: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(20),
+                                      ),
+                                    ),
+                                    builder: (context) => EditarAgendamentoModal(
+                                      docId: doc.id,
+                                      clienteAtual: doc['cliente'] ?? '',
+                                      pedidoAtual: doc['pedido'] ?? '',
+                                      dataAtual: doc['data'] as String?,
+                                      horarioAtual: doc['horario'] as String?,
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  margin: const EdgeInsets.only(bottom: 6),
+                                  decoration: BoxDecoration(
+                                    color: Color.fromRGBO(27, 79, 138, 1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Icon(
+                                    Icons.edit,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                ),
+                              ),
+                              // ✅ ADICIONADO: botão de excluir
+                              GestureDetector(
+                                onTap: () => _confirmarExclusao(context, doc.id),
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     );
@@ -421,6 +518,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
 class _AgendaWidget extends StatefulWidget {
   final Set<DateTime> datasComAgendamento;
   const _AgendaWidget({required this.datasComAgendamento});
@@ -428,6 +526,7 @@ class _AgendaWidget extends StatefulWidget {
   @override
   State<_AgendaWidget> createState() => _AgendaWidgetState();
 }
+
 class _AgendaWidgetState extends State<_AgendaWidget> {
   bool _expandido = false;
   late DateTime _mesExibido;
@@ -442,10 +541,12 @@ class _AgendaWidgetState extends State<_AgendaWidget> {
     super.initState();
     _mesExibido = DateTime(DateTime.now().year, DateTime.now().month);
   }
+
   List<DateTime> get _proximosSete {
     final hoje = DateTime.now();
     return List.generate(7, (i) => hoje.add(Duration(days: i)));
   }
+
   bool _temAgendamento(DateTime dia) =>
       widget.datasComAgendamento.contains(DateTime(dia.year, dia.month, dia.day));
 
@@ -566,6 +667,7 @@ class _AgendaWidgetState extends State<_AgendaWidget> {
     );
   }
 }
+
 class _Calendario extends StatelessWidget {
   final DateTime mesExibido;
   final Set<DateTime> datasComAgendamento;
@@ -639,7 +741,7 @@ class _Calendario extends StatelessWidget {
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: List.generate(7, (col) {
-              final indice = linha * 7 + col;
+              final indice = calendarIndex(linha, col); // (Ajustado mentalmente para manter a lógica original)
               final dia = indice - offset + 1;
               if (dia < 1 || dia > ultimo.day) {
                 return const SizedBox(width: 32, height: 32);
@@ -687,6 +789,358 @@ class _Calendario extends StatelessWidget {
           );
         }),
       ],
+    );
+  }
+
+  int calendarIndex(int linha, int col) => linha * 7 + col;
+}
+
+// ✅ ADICIONADO: Modal de edição de agendamento
+class EditarAgendamentoModal extends StatefulWidget {
+  final String docId;
+  final String clienteAtual;
+  final String pedidoAtual;
+  final String? dataAtual;
+  final String? horarioAtual;
+
+  const EditarAgendamentoModal({
+    super.key,
+    required this.docId,
+    required this.clienteAtual,
+    required this.pedidoAtual,
+    this.dataAtual,
+    this.horarioAtual,
+  });
+
+  @override
+  State<EditarAgendamentoModal> createState() => _EditarAgendamentoModalState();
+}
+
+class _EditarAgendamentoModalState extends State<EditarAgendamentoModal> {
+  late TextEditingController _clienteController;
+  late TextEditingController _pedidoController;
+  late TextEditingController _horarioController;
+
+  DateTime? _dataSelecionada;
+  bool _calendarioAberto = false;
+  late DateTime _mesExibido;
+
+  static const _meses = [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+  ];
+  static const _cab = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+
+  @override
+  void initState() {
+    super.initState();
+    _clienteController = TextEditingController(text: widget.clienteAtual);
+    _pedidoController = TextEditingController(text: widget.pedidoAtual);
+    _horarioController = TextEditingController(text: widget.horarioAtual ?? '');
+
+    if (widget.dataAtual != null) {
+      try {
+        _dataSelecionada = DateTime.parse(widget.dataAtual!);
+      } catch (_) {}
+    }
+    _mesExibido = _dataSelecionada != null
+        ? DateTime(_dataSelecionada!.year, _dataSelecionada!.month)
+        : DateTime(DateTime.now().year, DateTime.now().month);
+  }
+
+  @override
+  void dispose() {
+    _clienteController.dispose();
+    _pedidoController.dispose();
+    _horarioController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _salvarEdicao() async {
+    if (_clienteController.text.isNotEmpty &&
+        _pedidoController.text.isNotEmpty &&
+        _dataSelecionada != null &&
+        _horarioController.text.isNotEmpty) {
+      await FirebaseFirestore.instance
+          .collection('agendamentos')
+          .doc(widget.docId)
+          .update({
+        'cliente': _clienteController.text,
+        'pedido': _pedidoController.text,
+        'data': _dataSelecionada!.toIso8601String(),
+        'horario': _horarioController.text,
+      });
+      if (mounted) Navigator.pop(context);
+    }
+  }
+
+  String get _dataFormatada {
+    if (_dataSelecionada == null) return '';
+    return '${_dataSelecionada!.day.toString().padLeft(2, '0')}/'
+        '${_dataSelecionada!.month.toString().padLeft(2, '0')}/'
+        '${_dataSelecionada!.year}';
+  }
+
+  bool _mesmodia(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
+
+  Widget _buildCalendarioInline() {
+    final hoje = DateTime.now();
+    final primeiro = DateTime(_mesExibido.year, _mesExibido.month, 1);
+    final ultimo = DateTime(_mesExibido.year, _mesExibido.month + 1, 0);
+    final offset = primeiro.weekday % 7;
+    final linhas = ((offset + ultimo.day) / 7).ceil();
+
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(
+          color: const Color.fromRGBO(27, 79, 138, 0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: const Icon(Icons.chevron_left,
+                    color: Color.fromRGBO(27, 79, 138, 1), size: 20),
+                onPressed: () => setState(() =>
+                    _mesExibido = DateTime(_mesExibido.year, _mesExibido.month - 1)),
+              ),
+              Text(
+                '${_meses[_mesExibido.month - 1]} ${_mesExibido.year}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: Color.fromRGBO(27, 79, 138, 1),
+                ),
+              ),
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: const Icon(Icons.chevron_right,
+                    color: Color.fromRGBO(27, 79, 138, 1), size: 20),
+                onPressed: () => setState(() =>
+                    _mesExibido = DateTime(_mesExibido.year, _mesExibido.month + 1)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: _cab
+                .map((d) => SizedBox(
+                      width: 32,
+                      child: Center(
+                        child: Text(
+                          d,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(27, 79, 138, 0.6),
+                          ),
+                        ),
+                      ),
+                    ))
+                .toList(),
+          ),
+          const SizedBox(height: 4),
+          ...List.generate(linhas, (linha) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(7, (col) {
+                final indice = linha * 7 + col;
+                final dia = indice - offset + 1;
+                if (dia < 1 || dia > ultimo.day) {
+                  return const SizedBox(width: 32, height: 32);
+                }
+                final data = DateTime(_mesExibido.year, _mesExibido.month, dia);
+                final isHoje = _mesmodia(data, hoje);
+                final isSel =
+                    _dataSelecionada != null && _mesmodia(data, _dataSelecionada!);
+
+                Color bgColor = Colors.transparent;
+                Color textColor = const Color.fromRGBO(27, 79, 138, 1);
+                Border? border;
+
+                if (isSel) {
+                  bgColor = const Color.fromRGBO(27, 79, 138, 1);
+                  textColor = Colors.white;
+                } else if (isHoje) {
+                  bgColor = const Color.fromRGBO(27, 79, 138, 0.08);
+                  border = Border.all(
+                    color: const Color.fromRGBO(27, 79, 138, 0.3),
+                    width: 1,
+                  );
+                } else {
+                  border = Border.all(
+                    color: const Color.fromRGBO(200, 210, 225, 1),
+                    width: 1,
+                  );
+                }
+
+                return GestureDetector(
+                  onTap: () => setState(() {
+                    _dataSelecionada = data;
+                    _calendarioAberto = false;
+                  }),
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    margin: const EdgeInsets.symmetric(vertical: 2),
+                    decoration: BoxDecoration(
+                      color: bgColor,
+                      borderRadius: BorderRadius.circular(8),
+                      border: border,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '$dia',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight:
+                              isSel || isHoje ? FontWeight.bold : FontWeight.normal,
+                          color: textColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 25,
+        right: 25,
+        top: 25,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 25,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Center(
+              child: Text(
+                'Editar Agendamento',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromRGBO(27, 79, 138, 1),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            const Text('Cliente', style: TextStyle(fontWeight: FontWeight.bold)),
+            TextField(
+              controller: _clienteController,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: const Color.fromRGBO(232, 238, 247, 1),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(13),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 15),
+
+            const Text('Pedido', style: TextStyle(fontWeight: FontWeight.bold)),
+            TextField(
+              controller: _pedidoController,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: const Color.fromRGBO(232, 238, 247, 1),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(13),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 15),
+
+            const Text('Data', style: TextStyle(fontWeight: FontWeight.bold)),
+            GestureDetector(
+              onTap: () => setState(() => _calendarioAberto = !_calendarioAberto),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(232, 238, 247, 1),
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _dataSelecionada != null ? _dataFormatada : 'Selecionar data',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: _dataSelecionada != null ? Colors.black : Colors.black45,
+                      ),
+                    ),
+                    Icon(
+                      _calendarioAberto
+                          ? Icons.keyboard_arrow_up
+                          : Icons.calendar_today_outlined,
+                      color: const Color.fromRGBO(27, 79, 138, 1),
+                      size: 20,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (_calendarioAberto) _buildCalendarioInline(),
+            const SizedBox(height: 15),
+
+            const Text('Horário', style: TextStyle(fontWeight: FontWeight.bold)),
+            TextField(
+              controller: _horarioController,
+              keyboardType: TextInputType.datetime,
+              decoration: InputDecoration(
+                hintText: 'HH:MM',
+                filled: true,
+                fillColor: const Color.fromRGBO(232, 238, 247, 1),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(13),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 25),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                  backgroundColor: const Color.fromRGBO(27, 79, 138, 1),
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: _salvarEdicao,
+                child: const Text('Salvar Alterações'),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
