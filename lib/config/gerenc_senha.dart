@@ -14,9 +14,9 @@ class _GerencSenhaState extends State<GerencSenha> {
   bool _verNovaSenha = false;
   bool _verConfirmarNovaSenha = false;
 
-  TextEditingController _senhaAtualController = TextEditingController();
-  TextEditingController _novaSenhaController = TextEditingController();
-  TextEditingController _confirmarNovaSenhaController = TextEditingController();
+  final TextEditingController _senhaAtualController = TextEditingController();
+  final TextEditingController _novaSenhaController = TextEditingController();
+  final TextEditingController _confirmarNovaSenhaController = TextEditingController();
 
   @override
   void dispose() {

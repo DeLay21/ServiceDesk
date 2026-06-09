@@ -3,7 +3,6 @@ import 'package:servicedesk/login/login_page.dart';
 import 'package:servicedesk/login/cadastro_page.dart';
 import 'package:servicedesk/login/esqueci_senha_page.dart';
 import 'package:servicedesk/login/redefinir_senha_page.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -26,7 +25,6 @@ class ServiceDesk extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: Color.fromRGBO(27, 79, 138, 1),
-        //textTheme: GoogleFonts.leagueSpartanTextTheme(),
       ),
       initialRoute: '/',
       routes: {
