@@ -21,6 +21,25 @@ class UsuarioService {
     }
   }
 
+  static Future<void> atualizarEmail(
+    String senhaAtual,
+    String novoEmail,
+  ) async {
+    try {
+      final user = _auth.currentUser!;
+
+      final credencial = EmailAuthProvider.credential(
+        email: user.email!,
+        password: senhaAtual,
+      );
+      await user.reauthenticateWithCredential(credencial);
+
+      await user.verifyBeforeUpdateEmail(novoEmail);
+    } catch (e) {
+      throw Exception('Erro ao atualizar email: $e');
+    }
+  }
+
   static Future<void> alterarSenha(String senhaAtual, String novaSenha) async {
     try {
       final user = _auth.currentUser!;
