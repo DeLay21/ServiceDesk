@@ -448,11 +448,11 @@ Future<void> _confirmarExclusao(BuildContext context, String docId) async {
                               ],
                             ),
                           ),
-                          // ✅ ADICIONADO: coluna com botões de editar e excluir
+                          
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              // ✅ ADICIONADO: botão de editar
+                              
                               GestureDetector(
                                 onTap: () {
                                   showModalBottomSheet(
@@ -486,7 +486,7 @@ Future<void> _confirmarExclusao(BuildContext context, String docId) async {
                                   ),
                                 ),
                               ),
-                              // ✅ ADICIONADO: botão de excluir
+                            
                               GestureDetector(
                                 onTap: () => _confirmarExclusao(context, doc.id),
                                 child: Container(
@@ -740,7 +740,7 @@ class _Calendario extends StatelessWidget {
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: List.generate(7, (col) {
-              final indice = calendarIndex(linha, col); // (Ajustado mentalmente para manter a lógica original)
+              final indice = calendarIndex(linha, col); 
               final dia = indice - offset + 1;
               if (dia < 1 || dia > ultimo.day) {
                 return const SizedBox(width: 32, height: 32);
@@ -794,7 +794,7 @@ class _Calendario extends StatelessWidget {
   int calendarIndex(int linha, int col) => linha * 7 + col;
 }
 
-// ✅ ADICIONADO: Modal de edição de agendamento
+
 class EditarAgendamentoModal extends StatefulWidget {
   final String docId;
   final String clienteAtual;
