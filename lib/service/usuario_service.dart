@@ -21,9 +21,23 @@ class UsuarioService {
     }
   }
 
-  // cria o documento na coleção usuarios
-  static Future<void> criarPerfil(Map<String, dynamic> dados) async {
-    await _db.collection('usuarios').doc(uid).set(dados);
+  static Future<void> atualizarEmail(
+    String senhaAtual,
+    String novoEmail,
+  ) async {
+    try {
+      final user = _auth.currentUser!;
+
+      final credencial = EmailAuthProvider.credential(
+        email: user.email!,
+        password: senhaAtual,
+      );
+      await user.reauthenticateWithCredential(credencial);
+
+      await user.verifyBeforeUpdateEmail(novoEmail);
+    } catch (e) {
+      throw Exception('Erro ao atualizar email: $e');
+    }
   }
 
   static Future<void> alterarSenha(String senhaAtual, String novaSenha) async {
@@ -40,10 +54,6 @@ class UsuarioService {
     } catch (e) {
       throw Exception('Erro ao alterar: $e');
     }
-  }
-
-  static Future<void> deslogar() async {
-    await _auth.signOut();
   }
 
   // utilidades -----

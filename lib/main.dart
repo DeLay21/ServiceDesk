@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:servicedesk/login/login_page.dart';
 import 'package:servicedesk/login/cadastro_page.dart';
@@ -12,6 +14,15 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  FirebaseAuth.instance.userChanges().listen((user) async {
+    if (user != null) {
+      await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(user.uid)
+          .update({'email': user.email});
+    }
+  });
 
   runApp(const ServiceDesk());
 }

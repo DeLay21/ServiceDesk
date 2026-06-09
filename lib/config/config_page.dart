@@ -4,6 +4,7 @@ import 'package:servicedesk/config/gerenc_senha.dart';
 import 'package:servicedesk/config/notificacoes_page.dart';
 import 'package:servicedesk/config/politica_page.dart';
 import 'package:servicedesk/login/login_page.dart';
+import 'package:servicedesk/service/auth_service.dart';
 import 'package:servicedesk/service/usuario_service.dart';
 
 class ConfigPage extends StatefulWidget {
@@ -240,7 +241,7 @@ class _ConfigPageState extends State<ConfigPage> {
                   size: 16,
                 ),
                 onTap: () async {
-                  await UsuarioService.deslogar(); // desloga do Firebase
+                  await AuthService.signOut(); // desloga do Firebase
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(builder: (context) => const LoginPage()),

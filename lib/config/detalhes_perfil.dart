@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:servicedesk/login/login_page.dart';
+import 'package:servicedesk/service/auth_service.dart';
 import 'package:servicedesk/service/usuario_service.dart';
 
 class DetalhesPerfil extends StatefulWidget {
@@ -47,6 +49,35 @@ class _DetalhesPerfilState extends State<DetalhesPerfil> {
       return;
     }
 
+    final emailAtual = (await UsuarioService.buscarPerfil())['email'] ?? '';
+    final emailNovo = emailController.text.trim();
+    final emailMudou = emailNovo != emailAtual;
+
+    if (emailMudou) {
+      final senha = await _pedirSenha();
+      if (senha == null) return; // cancelou
+
+      await UsuarioService.atualizarEmail(senha, emailNovo);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Enviamos um email de confirmação. Confirme para atualizar.',
+            ),
+            duration: Duration(seconds: 4),
+          ),
+        );
+        await AuthService.signOut();
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+          (route) => false,
+        );
+      }
+      return;
+    }
+
     try {
       await UsuarioService.atualizarPerfil({
         'nome': nomeController.text.trim(),
@@ -70,6 +101,31 @@ class _DetalhesPerfilState extends State<DetalhesPerfil> {
         ).showSnackBar(SnackBar(content: Text('$e')));
       }
     }
+  }
+
+  Future<String?> _pedirSenha() async {
+    final controller = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmar senha'),
+        content: TextField(
+          controller: controller,
+          obscureText: true,
+          decoration: const InputDecoration(labelText: 'Senha atual'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, null),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, controller.text),
+            child: const Text('Confirmar'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
