@@ -31,7 +31,7 @@ class _GerencSenhaState extends State<GerencSenha> {
     if (novaSenha != confirmar) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Confirmacao nao'),
+          content: Text('A nova senha não confere, por favor verifique novamente'),
           backgroundColor: Colors.red,
         ),
       );
