@@ -446,6 +446,7 @@ Future<void> _confirmarExclusao(BuildContext context, String docId) async {
                                       color: Colors.white,
                                     ),
                                   ),
+                                  
                                 ),
                               ],
                             ),

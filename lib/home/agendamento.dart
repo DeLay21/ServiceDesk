@@ -166,7 +166,6 @@ class _AgendamentoModalState extends State<AgendamentoModal> {
       ),
       child: Column(
         children: [
-          // Navegação de mês
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -197,7 +196,6 @@ class _AgendamentoModalState extends State<AgendamentoModal> {
             ],
           ),
           const SizedBox(height: 4),
-          // Cabeçalho dos dias da semana
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: _cab
@@ -217,7 +215,6 @@ class _AgendamentoModalState extends State<AgendamentoModal> {
                 .toList(),
           ),
           const SizedBox(height: 4),
-          // Grade de dias
           ...List.generate(linhas, (linha) {
             return Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
