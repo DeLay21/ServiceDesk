@@ -21,7 +21,7 @@ exemplos, orientações sobre desenvolvimento móvel e uma referência completa 
 
 - **Arthur Enrik** - Modulo de Agendamento *(Criar o sistema de datas da Home Page)*
 
-- **Emily Oliveira** - Login *(Cadastro e Recuperação de senha)*
+- **Emily Oliveira** - Login *(Cadastro e Recuperação de senha)* - https://drive.google.com/file/d/1T5R_sp6Bx1rEDmI_eSLQ6zpmOsdscSdE/view?usp=drive_link
 
 - **Isaac Kerllon** - Home *(Estruturar a home)*
 
