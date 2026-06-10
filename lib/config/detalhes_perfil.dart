@@ -38,7 +38,6 @@ class _DetalhesPerfilState extends State<DetalhesPerfil> {
     final jaExisteEmail = await UsuarioService.existsByEmail(
       emailController.text.trim(),
     );
-
     if (jaExisteEmail) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -53,38 +52,41 @@ class _DetalhesPerfilState extends State<DetalhesPerfil> {
     final emailNovo = emailController.text.trim();
     final emailMudou = emailNovo != emailAtual;
 
-    if (emailMudou) {
-      final senha = await _pedirSenha();
-      if (senha == null) return; // cancelou
-
-      await UsuarioService.atualizarEmail(senha, emailNovo);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Enviamos um email de confirmação. Confirme para atualizar.',
-            ),
-            duration: Duration(seconds: 4),
-          ),
-        );
-        await AuthService.signOut();
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginPage()),
-          (route) => false,
-        );
-      }
-      return;
-    }
-
     try {
       await UsuarioService.atualizarPerfil({
         'nome': nomeController.text.trim(),
-        'email': emailController.text.trim(),
         'sexo': sexoController.text.trim(),
         'dataNascimento': dataNascController.text.trim(),
       });
+
+      if (emailMudou) {
+        final senha = await _pedirSenha();
+        if (senha == null) {
+          if (mounted) Navigator.pop(context);
+          return;
+        }
+
+        await UsuarioService.atualizarEmail(senha, emailNovo);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Enviamos um email de confirmação. Confirme para atualizar.',
+              ),
+              duration: Duration(seconds: 4),
+            ),
+          );
+          await AuthService.signOut();
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginPage()),
+            (route) => false,
+          );
+        }
+        return;
+      }
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -108,7 +110,7 @@ class _DetalhesPerfilState extends State<DetalhesPerfil> {
     return showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirmar senha'),
+        title: const Text('Confirmar senha para alteração de email'),
         content: TextField(
           controller: controller,
           obscureText: true,
