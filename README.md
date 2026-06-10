@@ -23,7 +23,7 @@ acompanhamento de atendimentos.
 | Aluno | Telas/Funcionalidades | Link do Video |
 |--------|----------------|-----------------------|
 | **Arthur Enrik**   | Modulo de Agendamento *(Criar o sistema de datas da Home Page)*  |     |                                           
-| **Emily Oliveira** | Login *(Cadastro e Recuperação de senha)*   |    |            
+| **Emily Oliveira** | Login *(Cadastro e Recuperação de senha)*   |  https://drive.google.com/file/d/1T5R_sp6Bx1rEDmI_eSLQ6zpmOsdscSdE/view?usp=drive_link  |            
 | **Isaac Kerllon**    | Home *(Estruturar a home)* |  |
 | **Luiz Gustavo**    | Modulo de Agendamento *(Cadastrar, Alterar e excluir tarefas)* | https://drive.google.com/file/d/1FOdz7GWXG2-tKYJ7xLBYebpTNLUh3Lqq/view?usp=sharing  | 
 | **Tiago Azevedo**    | Configurações *(Gerenciamento dos dados pessoais, gerenciar senha, politica de privacidade)* | https://drive.google.com/file/d/1vjFapP5SAv9yPnp6JqEFvkXqF8nPCQH3/view?usp=sharing |
